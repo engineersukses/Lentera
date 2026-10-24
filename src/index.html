@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lentera</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Ikon garis (SVG) yang dipakai ulang di seluruh tampilan -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor" /></symbol>
+        <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6.5" y="5" width="4" height="14" rx="1.2" fill="currentColor" /><rect x="13.5" y="5" width="4" height="14" rx="1.2" fill="currentColor" /></symbol>
+        <symbol id="i-rew" viewBox="0 0 24 24"><path d="M11.5 6v12L3 12zM21 6v12l-8.5-6z" fill="currentColor" /></symbol>
+        <symbol id="i-ff" viewBox="0 0 24 24"><path d="M12.5 6v12L21 12zM3 6v12l8.5-6z" fill="currentColor" /></symbol>
+        <symbol id="i-lyrics" viewBox="0 0 24 24"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /><circle cx="9" cy="10.5" r="1.3" fill="currentColor" /><circle cx="15" cy="10.5" r="1.3" fill="currentColor" /></symbol>
+        <symbol id="i-lyrics-on" viewBox="0 0 24 24"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" fill="currentColor" /><circle cx="9" cy="10.5" r="1.4" fill="#000" /><circle cx="15" cy="10.5" r="1.4" fill="#000" /></symbol>
+        <symbol id="i-left" viewBox="0 0 24 24"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-right" viewBox="0 0 24 24"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-reset" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.05-4.95M19 4v4h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5" fill="none" stroke="currentColor" stroke-width="2" /><path d="M12 13.5V9.5M10 3h4M12 3v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></symbol>
+        <symbol id="i-cup" viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3v3M11.5 3v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8" /><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8" /><circle cx="12" cy="12" r="1.2" fill="currentColor" /></symbol>
+        <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6 21V4M6 4h11l-2 4 2 4H6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /><circle cx="15" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="1.8" /><circle cx="9" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="1.8" /></symbol>
+        <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3.5c3.5 4.2 6 7.4 6 10.5a6 6 0 0 1-12 0c0-3.1 2.5-6.3 6-10.5z" fill="currentColor" /></symbol>
+        <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15zM10 20.5a2.2 2.2 0 0 0 4 0" fill="currentColor" /></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor" /><path d="M12 8v8M8 12h8" stroke="#000" stroke-width="2.2" stroke-linecap="round" /></symbol>
+        <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 0 1 3 3L8 18.5zM13.5 7l3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M6.5 12.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></symbol>
+        <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M12 2v8M8.5 7l3.5 3.5L15.5 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M3 13h5l1.5 2.5h5L16 13h5v6.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5z" fill="currentColor" /></symbol>
+        <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 2.5L5 13.5h6l-1 8 8.5-11h-6z" fill="currentColor" /></symbol>
+        <symbol id="i-bt" viewBox="0 0 24 24"><path d="M7 7.5l10 9-5 4.5V3l5 4.5-10 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+        <symbol id="i-headphones" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3" fill="none" stroke="currentColor" stroke-width="2" /><rect x="3" y="14" width="4.5" height="6.5" rx="1.8" fill="currentColor" /><rect x="16.5" y="14" width="4.5" height="6.5" rx="1.8" fill="currentColor" /></symbol>
+        <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M9 16a4.5 4.5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".45" /><circle cx="12" cy="19.5" r="1.5" fill="currentColor" /><path d="M4 4l16 16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></symbol>
+        <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M9 16a4.5 4.5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /><circle cx="12" cy="19.5" r="1.5" fill="currentColor" /></symbol>
+        <symbol id="i-vol" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
+        <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" /><path d="M16 9.5l5 5M21 9.5l-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
+        <symbol id="i-caps" viewBox="0 0 24 24"><path d="M12 4l7 7.5h-4v4H9v-4H5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /><path d="M9 19.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
+        <symbol id="i-key" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M7 10h.01M10.5 10h.01M14 10h.01M17 10h.01M8 14h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
+        <symbol id="i-mosque" viewBox="0 0 24 24"><path d="M12 3c-.5 1.5-4.5 3.5-4.5 7h9C16.5 6.5 12.5 4.5 12 3zM6 21v-9h12v9h-4v-4a2 2 0 0 0-4 0v4zM3.5 21V9.5M20.5 21V9.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" /></symbol>
+        <symbol id="i-note" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM14.5 3v4.5H19M9 12h7M9 16h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" /></symbol>
+        <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 17.5V6l11-2.5v11.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /><circle cx="6.5" cy="17.5" r="2.7" fill="currentColor" /><circle cx="17.5" cy="15" r="2.7" fill="currentColor" /></symbol>
+        <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h5l2 2h8A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z" fill="currentColor" /></symbol>
+        <symbol id="i-battery-low" viewBox="0 0 24 24"><rect x="2.5" y="7" width="17" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8" /><rect x="5" y="9.5" width="3.5" height="5" rx="1" fill="currentColor" /><path d="M21.5 10.5v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></symbol>
+        <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
+      </defs>
+    </svg>
+
+    <div id="stage">
+      <div id="notch" class="collapsed" data-page="music">
+        <div class="body">
+          <!-- Notch tertutup: cincin baterai, jam, gelombang suara -->
+          <div class="mini">
+            <span class="ring-mini" id="miniRing"></span>
+            <div class="mini-center">
+              <div class="mini-clock" id="miniClock"></div>
+              <div class="mini-text" id="miniText"></div>
+            </div>
+            <span class="wave" id="miniWave"><i></i><i></i><i></i><i></i><i></i></span>
+            <div class="eyes" id="eyes"><i></i><i></i><span class="zz">z</span></div>
+          </div>
+
+          <!-- Kartu sekilas -->
+          <div class="peek" id="peek">
+            <div class="peek-ring" id="peekRing"></div>
+            <div class="peek-text">
+              <div class="peek-title" id="peekTitle"></div>
+              <div class="peek-body" id="peekBody"></div>
+              <div class="peek-bar" id="peekBar"><i></i></div>
+            </div>
+            <div class="peek-side" id="peekSide"></div>
+          </div>
+
+          <!-- Notch terbuka -->
+          <div class="panel">
+            <header class="phead">
+              <div class="ptitle" id="ptitle"></div>
+              <div class="pdate"><span class="ring-mini" id="headRing"></span><span id="dateBig"></span><b id="clockBig"></b></div>
+              <span class="wave" id="headWave"><i></i><i></i><i></i><i></i><i></i></span>
+            </header>
+
+            <button class="nav nav-l" id="navL" title="Sebelumnya"><svg><use href="#i-left" /></svg></button>
+            <button class="nav nav-r" id="navR" title="Berikutnya"><svg><use href="#i-right" /></svg></button>
+
+            <!-- Musik -->
+            <section class="page" data-page="music">
+              <div class="player">
+                <div class="art" id="art"></div>
+                <div class="pinfo">
+                  <div class="ptrack" id="track"></div>
+                  <div class="partist" id="artist"></div>
+                </div>
+                <div class="ptime">
+                  <span id="tPos">00:00</span>
+                  <div class="seek" id="seek"><div class="seek-fill" id="seekFill"></div></div>
+                  <span id="tLeft">-00:00</span>
+                </div>
+                <div class="pctrl">
+                  <button class="lyr" id="lyricsBtn" title="Lirik"><svg><use href="#i-lyrics" /></svg></button>
+                  <div class="pbtns">
+                    <button data-media="prev" title="Sebelumnya"><svg><use href="#i-rew" /></svg></button>
+                    <button data-media="toggle" class="pp" id="playBtn" title="Putar/Jeda"><svg><use href="#i-play" /></svg></button>
+                    <button data-media="next" title="Berikutnya"><svg><use href="#i-ff" /></svg></button>
+                  </div>
+                </div>
+              </div>
+              <div class="lyrics" id="lyrics"></div>
+            </section>
+
+            <!-- Fokus: timer bebas + stopwatch -->
+            <section class="page" data-page="timer">
+              <div class="focus">
+                <div class="fring" id="fring">
+                  <svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="44" /><circle class="prg" id="fprg" cx="50" cy="50" r="44" /></svg>
+                  <svg class="ficon"><use href="#i-timer" /></svg>
+                </div>
+                <div class="fmain">
+                  <div class="fclock"><span id="fClock">25:00</span><button class="round" id="fReset" title="Ulang"><svg><use href="#i-reset" /></svg></button></div>
+                  <div class="fsub" id="fSub">Fokus</div>
+                  <div class="fbtns">
+                    <button class="pill" id="fLeft"></button>
+                    <button class="pill go" id="fStart"><svg><use href="#i-play" /></svg></button>
+                    <button class="pill" id="fMode"></button>
+                  </div>
+                </div>
+                <!-- Pengaturan timer -->
+                <div class="fedit" id="fEdit" hidden>
+                  <div class="fe-row">
+                    <label><input type="number" id="cdH" min="0" max="23" value="0" /><span>jam</span></label>
+                    <label><input type="number" id="cdM" min="0" max="59" value="25" /><span>mnt</span></label>
+                    <label><input type="number" id="cdS" min="0" max="59" value="0" /><span>dtk</span></label>
+                    <input type="text" id="cdLabel" placeholder="Nama, mis. Belajar" maxlength="24" />
+                  </div>
+                  <div class="presets" id="presets"></div>
+                  <div class="fe-row">
+                    <label class="chk"><input type="checkbox" id="cdRepeat" /> Ulangi otomatis</label>
+                    <span class="grow"></span>
+                    <button class="pill" id="cdSave"><svg><use href="#i-plus" /></svg>Simpan preset</button>
+                    <button class="pill light" id="fEditDone">Selesai</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Sholat -->
+            <section class="page" data-page="prayer">
+              <div class="prayer">
+                <div class="pr-left">
+                  <div class="pr-name" id="prName"></div>
+                  <div class="pr-time" id="prTime"></div>
+                  <div class="pr-count" id="prCount"></div>
+                </div>
+                <div class="pr-list" id="prList"></div>
+              </div>
+            </section>
+
+            <!-- Air -->
+            <section class="page" data-page="water">
+              <div class="water">
+                <div class="w-left">
+                  <div class="w-top">
+                    <div class="w-num"><b id="wNow">0</b><span> / <span id="wGoal">2</span> L</span></div>
+                    <button class="switch" id="wSwitch" title="Pengingat minum"><i><svg><use href="#i-bell" /></svg></i></button>
+                  </div>
+                  <div class="w-sub" id="wSub"></div>
+                  <div class="w-bar"><i id="wBar"></i></div>
+                  <div class="w-btns">
+                    <button class="pill blue" id="waterAdd"><svg><use href="#i-drop" /></svg><span>Minum</span></button>
+                    <button class="pill" id="waterSetBtn"><svg><use href="#i-sliders" /></svg>Atur</button>
+                  </div>
+                </div>
+                <div class="w-right">
+                  <div class="chart" id="waterChart"></div>
+                  <div class="w-set" id="waterSet" hidden>
+                    <div class="ws-row"><span>Target</span><span class="chips" id="goalChips"></span></div>
+                    <div class="ws-row"><span>Botol/gelas</span><span class="chips" id="glassChips"></span></div>
+                    <div class="ws-row"><span>Jam pengingat</span><span class="hours"><input type="number" id="wFrom" min="0" max="23" /> – <input type="number" id="wTo" min="1" max="24" /></span></div>
+                    <div class="ws-row"><span>Ingatkan tiap</span>
+                      <select id="wEvery"><option value="30">30 menit</option><option value="45">45 menit</option><option value="60">1 jam</option><option value="90">1,5 jam</option><option value="120">2 jam</option></select>
+                    </div>
+                    <div class="ws-row"><span></span><button class="link" id="waterUndo">Batalkan minum terakhir</button></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Rak -->
+            <section class="page" data-page="shelf">
+              <div class="shelf" id="shelf">
+                <div class="shelf-empty" id="shelfEmpty">
+                  <svg><use href="#i-inbox" /></svg>
+                  <b id="shelfDropText">Tarik file ke sini</b>
+                  <span>Tarik keluar kapan saja · klik untuk membuka</span>
+                </div>
+                <ul class="shelf-items" id="shelfItems"></ul>
+                <button class="shelf-clear" id="shelfClear" title="Kosongkan rak">Kosongkan</button>
+              </div>
+            </section>
+
+            <!-- To-do -->
+            <section class="page" data-page="todo">
+              <div class="todo">
+                <div class="t-left">
+                  <div class="t-score" id="todoScore">0/0</div>
+                  <div class="t-sub">Selesai hari ini</div>
+                  <div class="t-btns">
+                    <button class="pill" id="todoAddBtn"><svg><use href="#i-plus" /></svg>Tambah</button>
+                    <button class="pill" id="todoEditBtn"><svg><use href="#i-pencil" /></svg>Ubah</button>
+                  </div>
+                </div>
+                <div class="t-right">
+                  <form class="t-form" id="todoForm" hidden>
+                    <input type="text" id="todoInput" placeholder="Nama tugas" maxlength="120" />
+                    <input type="time" id="todoTime" title="Jam pengingat (opsional)" />
+                    <button class="round ok" id="todoSubmit" title="Simpan"><svg><use href="#i-check" /></svg></button>
+                    <button class="round" type="button" id="todoCancel" title="Batal"><svg><use href="#i-x" /></svg></button>
+                  </form>
+                  <ul class="t-list" id="todoList"></ul>
+                </div>
+              </div>
+            </section>
+
+            <!-- Notifikasi -->
+            <section class="page" data-page="notif">
+              <ul class="n-list" id="notifList"></ul>
+            </section>
+
+            <!-- Pengaturan -->
+            <section class="page" data-page="settings">
+              <div class="settings">
+                <label>Nama panggilan <input type="text" id="setName" maxlength="20" placeholder="mis. Claudia" /></label>
+                <label>Kota (jadwal sholat) <select id="setCity"></select></label>
+                <label class="custom-loc" id="customLoc">Lintang / Bujur
+                  <span class="pair"><input type="number" step="0.0001" id="setLat" /><input type="number" step="0.0001" id="setLng" /></span>
+                </label>
+                <label>Ingatkan sebelum sholat <select id="setPreMin">
+                  <option value="0">Tidak</option><option value="5">5 menit</option><option value="10">10 menit</option><option value="15">15 menit</option><option value="30">30 menit</option>
+                </select></label>
+                <label>Koreksi jadwal sholat (menit) <input type="number" id="setOffset" min="-15" max="15" value="0" /></label>
+                <label>Tera muncul setiap <select id="setMascot">
+                  <option value="0">Matikan</option><option value="2">2 menit</option><option value="4">4 menit</option><option value="7">7 menit</option><option value="10">10 menit</option><option value="20">20 menit</option>
+                </select></label>
+                <label class="chk"><input type="checkbox" id="setPrayerSound" /> Bunyi saat masuk waktu sholat</label>
+                <label class="chk"><input type="checkbox" id="setEyes" /> Maskot mata saat komputer diam</label>
+                <label class="chk"><input type="checkbox" id="setMinimal" /> Notch minimal (garis tipis)</label>
+                <label class="chk"><input type="checkbox" id="setMiniLyrics" /> Lirik di notch tertutup</label>
+                <label class="chk"><input type="checkbox" id="setNotifPeek" /> Tampilkan notifikasi aplikasi lain</label>
+                <label class="chk"><input type="checkbox" id="setOverlays" /> Tampilan volume, Caps Lock &amp; bahasa</label>
+                <label class="chk"><input type="checkbox" id="setAutostart" /> Jalankan saat Windows menyala</label>
+                <button class="link danger" id="resetAll">Hapus semua data Lentera</button>
+              </div>
+            </section>
+
+            <div class="dots" id="dots"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mascot" id="mascot"></div>
+      <div class="bubble" id="bubble"></div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

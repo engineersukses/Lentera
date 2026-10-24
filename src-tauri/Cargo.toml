@@ -1,0 +1,57 @@
+[package]
+name = "lentera"
+version = "1.0.0"
+description = "Lentera - notch kecil yang hidup di atas layar Windows"
+authors = ["Claudia"]
+edition = "2021"
+
+[lib]
+name = "lentera_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-drag = "2"
+tauri-plugin-single-instance = "2"
+tauri-plugin-autostart = "2"
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+ureq = { version = "2", default-features = false, features = ["json", "native-tls"] }
+native-tls = "0.2"
+base64 = "0.22"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61", features = [
+  "Foundation",
+  "Foundation_Collections",
+  "Media_Control",
+  "Storage_Streams",
+  "Networking_Connectivity",
+  "Devices_Enumeration",
+  "Devices_Bluetooth",
+  "ApplicationModel",
+  "UI_Notifications",
+  "UI_Notifications_Management",
+  "Win32_System_Power",
+  "Win32_System_Com",
+  "Win32_System_Com_StructuredStorage",
+  "Win32_System_Variant",
+  "Win32_System_SystemInformation",
+  "Win32_Foundation",
+  "Win32_Globalization",
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_Media_Audio",
+  "Win32_Media_Audio_Endpoints",
+] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

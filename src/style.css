@@ -1,0 +1,2105 @@
+:root {
+  --bg: #000;
+  --gray: #2c2c2e;
+  --gray-2: #3a3a3c;
+  --fg: #ffffff;
+  --fg-2: #a1a1a6;
+  --fg-3: #6e6e73;
+  --line: rgba(255, 255, 255, 0.1);
+  --green: #32d74b;
+  --green-bg: #173a1d;
+  --blue: #2f8cff;
+  --blue-2: #5ab4ff;
+  --red: #ff4b55;
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  font-family: "Segoe UI Variable Display", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--fg);
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+
+svg {
+  width: 1em;
+  height: 1em;
+  flex: none;
+}
+
+#stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* ================= Bentuk notch ================= */
+
+#notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--w, 236px);
+  height: var(--h, 40px);
+  --r: 16px;
+  transition:
+    width 0.5s var(--ease),
+    height 0.5s var(--ease);
+}
+
+/* Lengkungan cekung di kiri-kanan atas, seperti notch laptop */
+#notch::before,
+#notch::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+}
+
+#notch::before {
+  left: -12px;
+  background: radial-gradient(circle at 0 100%, transparent 11.5px, var(--bg) 12px);
+}
+
+#notch::after {
+  right: -12px;
+  background: radial-gradient(circle at 100% 100%, transparent 11.5px, var(--bg) 12px);
+}
+
+.body {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg);
+  border-radius: 0 0 var(--r) var(--r);
+  transition: border-radius 0.5s var(--ease), background 0.5s;
+}
+
+#notch.expanded,
+#notch.peeking {
+  filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.45));
+}
+
+#notch.expanded {
+  --w: 660px;
+  --h: 228px;
+}
+
+#notch.expanded .body,
+#notch.peeking .body {
+  border-radius: 0 0 34px 34px;
+}
+
+#notch.expanded.lyrics-mode {
+  --w: 820px;
+}
+
+#notch.expanded.lyrics-mode .body {
+  background: linear-gradient(180deg, #000 0%, #050b1f 35%, #13306e 100%);
+}
+
+#notch.peeking {
+  --w: 500px;
+  --h: 92px;
+}
+
+#notch.peeking.small {
+  --w: 330px;
+  --h: 56px;
+}
+
+#notch.peeking.small .body {
+  border-radius: 0 0 26px 26px;
+}
+
+#notch.collapsed.wide {
+  --w: 380px;
+}
+
+#notch.collapsed.minimal:not(.wide) {
+  --w: 180px;
+  --h: 6px;
+}
+
+#notch.collapsed.minimal:not(.wide) .body {
+  border-radius: 0 0 5px 5px;
+}
+
+#notch.collapsed.minimal:not(.wide)::before,
+#notch.collapsed.minimal:not(.wide)::after {
+  opacity: 0;
+}
+
+#notch.minimal:not(.wide) .mini {
+  opacity: 0;
+}
+
+/* Mata: notch diberi cahaya biru-ungu di bagian bawah */
+#notch.collapsed.idle .body {
+  background:
+    radial-gradient(120% 70% at 20% 120%, rgba(0, 200, 255, 0.95), transparent 60%),
+    radial-gradient(120% 70% at 80% 120%, rgba(140, 70, 255, 0.95), transparent 60%),
+    #000;
+}
+
+#notch.collapsed.idle {
+  --h: 46px;
+}
+
+#notch.glow .body {
+  box-shadow: inset 0 -2px 0 var(--accent, #fff);
+}
+
+.mini,
+.peek,
+.panel {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.25s;
+}
+
+.peek,
+.panel {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#notch.peeking .mini,
+#notch.expanded .mini {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#notch.peeking .peek {
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0.14s;
+}
+
+#notch.expanded .panel {
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0.16s;
+}
+
+/* ================= Notch tertutup ================= */
+
+.mini {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+}
+
+.mini > * {
+  transition: opacity 0.6s;
+}
+
+.mini-center {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  place-items: center;
+}
+
+.mini-clock,
+.mini-text {
+  grid-area: 1 / 1;
+  transition: opacity 0.6s;
+}
+
+.mini-clock {
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-text {
+  max-width: 100%;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--fg-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+}
+
+#notch.has-text .mini-text {
+  opacity: 1;
+}
+
+#notch.has-text .mini-clock {
+  opacity: 0;
+}
+
+/* Cincin progres kecil (baterai) */
+.ring-mini {
+  --p: 0;
+  --c: var(--green);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: conic-gradient(var(--c) calc(var(--p) * 1%), rgba(255, 255, 255, 0.14) 0);
+  -webkit-mask: radial-gradient(circle, transparent 5.5px, #000 6px);
+  mask: radial-gradient(circle, transparent 5.5px, #000 6px);
+  flex: none;
+}
+
+/* Ikon gelombang suara */
+.wave {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 18px;
+}
+
+.wave i {
+  width: 3px;
+  border-radius: 2px;
+  background: var(--fg);
+  height: 60%;
+}
+
+.wave i:nth-child(1) {
+  height: 55%;
+}
+.wave i:nth-child(2) {
+  height: 100%;
+}
+.wave i:nth-child(3) {
+  height: 75%;
+}
+.wave i:nth-child(4) {
+  height: 100%;
+}
+.wave i:nth-child(5) {
+  height: 65%;
+}
+
+.wave.on i {
+  animation: wv 0.9s ease-in-out infinite;
+}
+.wave.on i:nth-child(2) {
+  animation-delay: -0.2s;
+}
+.wave.on i:nth-child(3) {
+  animation-delay: -0.5s;
+}
+.wave.on i:nth-child(4) {
+  animation-delay: -0.35s;
+}
+.wave.on i:nth-child(5) {
+  animation-delay: -0.65s;
+}
+
+@keyframes wv {
+  0%,
+  100% {
+    transform: scaleY(0.45);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* Mata maskot */
+.eyes {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -58%);
+  display: flex;
+  gap: 18px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.eyes i {
+  width: 12px;
+  height: 19px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
+  animation: blink 5s infinite;
+  transition: height 0.6s var(--ease), border-radius 0.6s;
+}
+
+@keyframes blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+
+.eyes .zz {
+  position: absolute;
+  right: -16px;
+  top: -8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #cfe3ff;
+  opacity: 0;
+  animation: zf 2.4s ease-in-out infinite;
+}
+
+@keyframes zf {
+  50% {
+    transform: translate(3px, -4px);
+  }
+}
+
+#notch.idle .eyes {
+  opacity: 1;
+}
+
+#notch.idle .mini > :not(.eyes) {
+  opacity: 0;
+}
+
+#notch.dozing .eyes i {
+  height: 3px;
+  border-radius: 2px;
+  margin-top: 8px;
+  animation: none;
+}
+
+#notch.dozing .eyes .zz {
+  opacity: 1;
+}
+
+#notch.waving .eyes i {
+  height: 9px;
+  border-radius: 9px 9px 3px 3px;
+  animation: none;
+}
+
+#notch.waving .eyes {
+  animation: hello 0.4s ease-in-out 5 alternate;
+}
+
+@keyframes hello {
+  to {
+    transform: translate(-50%, -58%) rotate(6deg);
+  }
+}
+
+/* ================= Kartu sekilas ================= */
+
+.peek {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 6px 34px 4px;
+}
+
+.peek-ring {
+  --p: 100;
+  --c: var(--green);
+  position: relative;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  font-size: 19px;
+}
+
+.peek-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(var(--c) calc(var(--p) * 1%), rgba(255, 255, 255, 0.16) 0);
+  -webkit-mask: radial-gradient(circle, transparent 17px, #000 17.5px);
+  mask: radial-gradient(circle, transparent 17px, #000 17.5px);
+}
+
+#notch.small .peek {
+  padding: 4px 24px 2px;
+  gap: 12px;
+}
+
+#notch.small .peek-ring {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+}
+
+#notch.small .peek-ring::before {
+  -webkit-mask: radial-gradient(circle, transparent 11px, #000 11.5px);
+  mask: radial-gradient(circle, transparent 11px, #000 11.5px);
+}
+
+.peek-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.peek-title {
+  font-weight: 700;
+  font-size: 19px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#notch.small .peek-title {
+  font-size: 14px;
+}
+
+.peek-body {
+  color: var(--fg-2);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.peek-body:empty {
+  display: none;
+}
+
+.peek-bar {
+  display: none;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--gray-2);
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.peek-bar.on {
+  display: block;
+}
+
+.peek-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--fg);
+  transition: width 0.15s;
+}
+
+.peek-side {
+  flex: none;
+  font-size: 32px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+#notch.small .peek-side {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Lingkaran ikon di kanan (mis. headphone) */
+.peek-side .bubble-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  background: radial-gradient(circle, #0d2a36 0 55%, #0a1d26 56% 100%);
+  box-shadow: inset 0 0 0 2px #1b4d63, 0 0 0 5px #0d1f28;
+  color: #9fe3ff;
+}
+
+#notch.peeking[data-theme] .body {
+  background: var(--g);
+}
+
+/* ================= Panel terbuka ================= */
+
+.panel {
+  padding: 12px 56px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.phead {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 30px;
+  margin: 0 -32px 4px -32px;
+}
+
+.ptitle {
+  font-size: 19px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ptitle em {
+  font-style: normal;
+}
+
+.pdate {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  white-space: nowrap;
+}
+
+.pdate b {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pdate .ring-mini {
+  width: 20px;
+  height: 20px;
+  -webkit-mask: radial-gradient(circle, transparent 6.5px, #000 7px);
+  mask: radial-gradient(circle, transparent 6.5px, #000 7px);
+}
+
+.phead .wave {
+  margin-left: auto;
+  height: 20px;
+}
+
+#notch[data-page="music"] .pdate {
+  left: calc(50% + 40px);
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  margin-top: -14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--gray-2);
+  color: var(--fg);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  z-index: 2;
+  transition: filter 0.15s;
+}
+
+.nav:hover {
+  filter: brightness(1.3);
+}
+
+.nav-l {
+  left: 16px;
+}
+
+.nav-r {
+  right: 16px;
+}
+
+.nav[hidden] {
+  display: none;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.dots button {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: #8e8e93;
+  transition: width 0.3s var(--ease), background 0.3s;
+}
+
+.dots button.on {
+  width: 22px;
+  background: #fff;
+}
+
+.page {
+  display: none;
+  flex: 1;
+  min-height: 0;
+}
+
+#notch[data-page="music"] .page[data-page="music"],
+#notch[data-page="timer"] .page[data-page="timer"],
+#notch[data-page="prayer"] .page[data-page="prayer"],
+#notch[data-page="water"] .page[data-page="water"],
+#notch[data-page="shelf"] .page[data-page="shelf"],
+#notch[data-page="todo"] .page[data-page="todo"],
+#notch[data-page="notif"] .page[data-page="notif"],
+#notch[data-page="settings"] .page[data-page="settings"] {
+  display: flex;
+}
+
+/* Tombol pil seperti di Nusa */
+.pill {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: var(--gray);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: filter 0.15s, transform 0.1s;
+}
+
+.pill svg {
+  font-size: 16px;
+}
+
+.pill:hover {
+  filter: brightness(1.25);
+}
+
+.pill:active {
+  transform: scale(0.97);
+}
+
+.pill.go {
+  min-width: 86px;
+  background: var(--red);
+}
+
+.pill.blue {
+  background: #0f5fd1;
+}
+
+.pill.light {
+  background: #fff;
+  color: #000;
+}
+
+.round {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--gray);
+  display: inline-grid;
+  place-items: center;
+  font-size: 15px;
+}
+
+.round.ok {
+  background: var(--green);
+  color: #002a0c;
+}
+
+.link {
+  color: var(--fg-2);
+  font-size: 12px;
+}
+
+.link:hover {
+  color: var(--fg);
+}
+
+.link.danger {
+  color: var(--red);
+}
+
+.chk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fg-2);
+  font-size: 12px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="time"],
+select {
+  background: var(--gray);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  height: 30px;
+  padding: 0 10px;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--fg-3);
+}
+
+input[type="checkbox"] {
+  accent-color: var(--green);
+}
+
+.grow {
+  flex: 1;
+}
+
+/* ================= Musik ================= */
+
+.page[data-page="music"] {
+  gap: 0;
+}
+
+.player {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  grid-template-rows: 1fr auto auto;
+  column-gap: 26px;
+  row-gap: 4px;
+  min-width: 0;
+  margin-top: -30px;
+}
+
+.art {
+  grid-row: 1;
+  width: 100px;
+  height: 100px;
+  border-radius: 14px;
+  background: var(--gray) center / cover;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+  align-self: end;
+}
+
+.pinfo {
+  align-self: center;
+  min-width: 0;
+  padding-top: 26px;
+}
+
+.ptrack {
+  font-size: 19px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.partist {
+  color: var(--fg-2);
+  font-size: 14.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ptime {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  margin-top: 6px;
+}
+
+.seek {
+  position: relative;
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+}
+
+.seek::before {
+  content: "";
+  position: absolute;
+  inset: -9px 0;
+}
+
+.seek-fill {
+  height: 100%;
+  width: 0;
+  background: #fff;
+  border-radius: 3px;
+}
+
+.pctrl {
+  grid-column: 1 / -1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 36px;
+}
+
+.lyr {
+  font-size: 24px;
+  color: var(--fg-2);
+  margin-left: 32px;
+}
+
+.lyr:hover {
+  color: var(--fg);
+}
+
+.pbtns {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+
+.pbtns button {
+  font-size: 20px;
+  display: grid;
+  place-items: center;
+}
+
+.pbtns .pp {
+  font-size: 24px;
+}
+
+.lyrics {
+  display: none;
+}
+
+/* Mode lirik: notch melebar, dua panel */
+#notch.lyrics-mode .phead,
+#notch.lyrics-mode .nav,
+#notch.lyrics-mode .dots {
+  display: none;
+}
+
+#notch.lyrics-mode .panel {
+  padding: 18px 28px 18px 36px;
+}
+
+#notch.lyrics-mode .page[data-page="music"] {
+  gap: 22px;
+}
+
+#notch.lyrics-mode .player {
+  flex: 0 0 350px;
+  grid-template-columns: 100px 1fr;
+  margin-top: 0;
+  column-gap: 26px;
+}
+
+#notch.lyrics-mode .pinfo {
+  padding-top: 0;
+}
+
+#notch.lyrics-mode .ptime {
+  gap: 26px;
+}
+
+#notch.lyrics-mode .pctrl .lyr {
+  color: #fff;
+}
+
+#notch.lyrics-mode .lyrics {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding-left: 18px;
+  -webkit-mask-image: linear-gradient(transparent, #000 20%, #000 80%, transparent);
+  mask-image: linear-gradient(transparent, #000 20%, #000 80%, transparent);
+}
+
+.lyrics-inner {
+  transition: transform 0.5s var(--ease);
+}
+
+.lyrics .l {
+  padding: 6px 0;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.32);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.35s;
+}
+
+.lyrics .l:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.lyrics .l.cur {
+  color: #fff;
+  font-size: 21px;
+}
+
+.lyrics .msg {
+  color: var(--fg-2);
+  font-size: 15px;
+  padding-top: 70px;
+}
+
+.lyrics .credit {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ================= Fokus ================= */
+
+.focus {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding-left: 30px;
+}
+
+.fring {
+  --c: var(--red);
+  position: relative;
+  flex: none;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--c) 22%, #000) 0 60%, transparent 61%);
+  display: grid;
+  place-items: center;
+}
+
+.fring > svg:first-child {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.fring circle {
+  fill: none;
+  stroke-width: 8;
+}
+
+.fring .trk {
+  stroke: color-mix(in srgb, var(--c) 35%, #000);
+}
+
+.fring .prg {
+  stroke: var(--c);
+  stroke-linecap: round;
+  stroke-dasharray: 276.46;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.3s linear;
+}
+
+.fring .ficon {
+  font-size: 38px;
+  color: #fff;
+}
+
+.fmain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fclock {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#fClock {
+  font-size: 46px;
+  font-weight: 700;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.fclock .round {
+  position: absolute;
+  left: 100%;
+  margin-left: 14px;
+}
+
+.fsub {
+  color: var(--fg-2);
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.fbtns {
+  display: flex;
+  gap: 12px;
+}
+
+.fedit {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 4px 0 30px;
+}
+
+.fedit[hidden] {
+  display: none;
+}
+
+.fe-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fe-row label:not(.chk) {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--fg-3);
+  font-size: 12px;
+}
+
+.fe-row input[type="number"] {
+  width: 56px;
+  text-align: center;
+}
+
+.fe-row input[type="text"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.fedit .pill {
+  height: 30px;
+  font-size: 13px;
+}
+
+.presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.preset {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  border-radius: 13px;
+  background: var(--gray);
+  font-size: 12px;
+  overflow: hidden;
+}
+
+.preset .use {
+  padding: 0 4px 0 11px;
+  height: 100%;
+}
+
+.preset .x {
+  width: 24px;
+  height: 100%;
+  color: var(--fg-3);
+}
+
+.preset .x:hover {
+  color: var(--fg);
+}
+
+/* ================= Sholat ================= */
+
+.prayer {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-left: 8px;
+}
+
+.pr-left {
+  flex: 0 0 132px;
+  min-width: 0;
+}
+
+.pr-name {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.pr-time {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.pr-count {
+  color: var(--fg-2);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.pr-list {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+.pcard {
+  --c: #888;
+  position: relative;
+  height: 112px;
+  min-width: 0;
+  border-radius: 14px;
+  padding: 9px 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--g, var(--gray));
+  border: 1px solid color-mix(in srgb, var(--c) 35%, transparent);
+  opacity: 0.75;
+  transition: transform 0.25s, opacity 0.25s;
+}
+
+.pcard.next {
+  opacity: 1;
+  border-color: var(--c);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--c) 45%, transparent);
+}
+
+.pcard.past {
+  opacity: 0.4;
+}
+
+.pcard .pi {
+  font-size: 18px;
+}
+
+.pcard .pn {
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.pcard .pt {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ================= Air ================= */
+
+.water {
+  flex: 1;
+  display: flex;
+  gap: 18px;
+  padding: 0 0 0 24px;
+}
+
+.w-left {
+  flex: 0 0 262px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.w-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.w-num b {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.w-num > span {
+  color: var(--fg-2);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.switch {
+  width: 56px;
+  height: 32px;
+  border-radius: 16px;
+  background: var(--gray-2);
+  position: relative;
+  transition: background 0.2s;
+}
+
+.switch i {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  color: #1270ff;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  transition: left 0.25s var(--ease);
+}
+
+.switch.on {
+  background: #1e88ff;
+}
+
+.switch.on i {
+  left: 27px;
+}
+
+.w-sub {
+  color: var(--fg-2);
+  font-size: 15px;
+  margin-top: 4px;
+}
+
+.w-sub b {
+  color: var(--blue-2);
+}
+
+.w-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--gray-2);
+  margin: 6px 0 10px;
+  overflow: hidden;
+}
+
+.w-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #1e88ff, #5ad0ff);
+  transition: width 0.5s var(--ease);
+}
+
+.w-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.w-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-left: 1px solid var(--line);
+  padding-left: 18px;
+}
+
+.chart {
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  grid-template-rows: 88px 18px;
+  column-gap: 8px;
+}
+
+.chart[hidden] {
+  display: none;
+}
+
+.chart .bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+  border-right: 1px solid var(--line);
+  padding-right: 8px;
+}
+
+.chart .bars span {
+  flex: 1;
+  height: 100%;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.chart .bars i {
+  width: 100%;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #2c8dff, #1b5fd6);
+  transition: height 0.5s var(--ease);
+}
+
+.chart .axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--fg-2);
+  font-size: 13px;
+}
+
+.chart .ticks {
+  display: flex;
+  gap: 7px;
+  padding-right: 8px;
+  color: var(--fg-2);
+  font-size: 13px;
+}
+
+.chart .ticks span {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.w-set {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.w-set[hidden] {
+  display: none;
+}
+
+.ws-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--fg-2);
+  font-size: 12px;
+}
+
+.chips {
+  display: flex;
+  gap: 4px;
+}
+
+.chips button {
+  padding: 3px 9px;
+  border-radius: 10px;
+  background: var(--gray);
+  color: var(--fg-2);
+  font-size: 11px;
+}
+
+.chips button.on {
+  background: #1e88ff;
+  color: #fff;
+}
+
+.hours input {
+  width: 48px;
+  height: 24px;
+  text-align: center;
+}
+
+.ws-row select {
+  height: 24px;
+  padding: 0 6px;
+}
+
+/* ================= Rak ================= */
+
+.shelf {
+  position: relative;
+  flex: 1;
+  margin: 0 8px;
+  border: 1.5px dashed rgba(255, 255, 255, 0.28);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+#notch.dragging .shelf {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.shelf-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.shelf-empty svg {
+  font-size: 46px;
+  margin-bottom: 6px;
+}
+
+.shelf-empty b {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.shelf-empty span {
+  color: var(--fg-2);
+  font-size: 13px;
+}
+
+.shelf-items {
+  list-style: none;
+  margin: 0;
+  padding: 10px 12px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  height: 100%;
+  align-items: center;
+}
+
+.file {
+  position: relative;
+  flex: 0 0 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  cursor: grab;
+}
+
+.file:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.ficon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #111;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+}
+
+.ficon.folder {
+  background: none;
+  color: #5ac8fa;
+  font-size: 50px;
+}
+
+.fname {
+  font-size: 12px;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fsize {
+  color: var(--fg-2);
+  font-size: 11px;
+}
+
+.file.missing {
+  opacity: 0.4;
+}
+
+.file .fx {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--gray-2);
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  opacity: 0;
+}
+
+.file:hover .fx {
+  opacity: 1;
+}
+
+.shelf-clear {
+  position: absolute;
+  right: 10px;
+  bottom: 6px;
+  color: var(--fg-3);
+  font-size: 11px;
+}
+
+.shelf-clear:hover {
+  color: var(--fg);
+}
+
+/* ================= To-do ================= */
+
+.todo {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  min-height: 0;
+  padding-left: 16px;
+}
+
+.t-left {
+  flex: 0 0 248px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.t-score {
+  font-size: 46px;
+  font-weight: 700;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-sub {
+  color: var(--fg-2);
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.t-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.t-btns .pill {
+  height: 38px;
+  padding: 0 12px;
+}
+
+.t-btns .pill.on {
+  background: #fff;
+  color: #000;
+}
+
+.t-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.t-form {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+.t-form[hidden] {
+  display: none;
+}
+
+.t-form #todoInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.t-form input[type="time"] {
+  width: 92px;
+  padding: 0 6px;
+}
+
+.t-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 6px 0 0;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.t-list li[data-id] {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: #1c1c1e;
+  cursor: pointer;
+}
+
+.t-list li.done {
+  background: var(--green-bg);
+}
+
+.t-list .tt {
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.t-list li.done .tt {
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: line-through;
+}
+
+.t-list .ttime {
+  color: var(--fg-2);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--fg-3);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  flex: none;
+  color: #fff;
+}
+
+.done .check {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.t-list .act {
+  display: none;
+  color: var(--fg-2);
+  font-size: 15px;
+}
+
+.todo.editing .t-list .act {
+  display: grid;
+}
+
+.t-list .empty {
+  color: var(--fg-3);
+  padding-top: 40px;
+  text-align: center;
+  list-style: none;
+}
+
+/* ================= Notifikasi ================= */
+
+.n-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 24px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.n-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.n-list .na {
+  color: var(--fg-3);
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.n-list .nt {
+  font-weight: 600;
+}
+
+.n-list .nb {
+  color: var(--fg-2);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.n-list .empty {
+  border: 0;
+  color: var(--fg-2);
+  text-align: center;
+  padding-top: 50px;
+}
+
+/* ================= Pengaturan ================= */
+
+.settings {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+  overflow-y: auto;
+  align-content: start;
+  padding: 0 8px;
+}
+
+.settings > label:not(.chk) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--fg-2);
+  font-size: 11px;
+}
+
+.settings .pair {
+  display: flex;
+  gap: 6px;
+}
+
+.settings .pair input {
+  width: 50%;
+}
+
+.custom-loc[hidden] {
+  display: none !important;
+}
+
+.settings .danger {
+  justify-self: start;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #636366;
+  border-radius: 3px;
+}
+
+/* Warna dan suasana tiap waktu sholat (kartu dan pengingat) */
+.p-imsak,
+.p-terbit {
+  --c: #94a3b8;
+  --g: linear-gradient(160deg, #1d2230, #14161d);
+}
+.p-subuh,
+#notch[data-theme="subuh"] {
+  --c: #a78bfa;
+  --g: linear-gradient(160deg, #2a2156 0%, #4c2f6b 60%, #7a3f63 100%);
+}
+.p-dzuhur,
+#notch[data-theme="dzuhur"] {
+  --c: #facc15;
+  --g: linear-gradient(160deg, #4a3b0c 0%, #2b2408 100%);
+}
+.p-ashar,
+#notch[data-theme="ashar"] {
+  --c: #fb923c;
+  --g: linear-gradient(160deg, #5a2c0e 0%, #33190a 100%);
+}
+.p-maghrib,
+#notch[data-theme="maghrib"] {
+  --c: #f43f5e;
+  --g: linear-gradient(160deg, #5c1631 0%, #3a1440 60%, #1e1236 100%);
+}
+.p-isya,
+#notch[data-theme="isya"] {
+  --c: #60a5fa;
+  --g: radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.35) 0 1px, transparent 2px),
+    radial-gradient(circle at 25% 45%, rgba(255, 255, 255, 0.25) 0 1px, transparent 2px),
+    linear-gradient(160deg, #0f1c45 0%, #0a1129 100%);
+}
+
+/* ---------- Tera si maskot ---------- */
+
+.mascot {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 52px;
+  height: 58px;
+  opacity: 0;
+  transform: translateX(-26px) scale(0.4);
+  transform-origin: left center;
+  transition: opacity 0.35s, transform 0.5s var(--ease);
+  pointer-events: none;
+  cursor: pointer;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+}
+
+.mascot.show {
+  opacity: 1;
+  transform: translateX(6px) scale(1);
+  pointer-events: auto;
+}
+
+.mascot svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tera .t-body,
+.tera .t-arm,
+.tera .t-flame {
+  transform-box: fill-box;
+}
+
+.tera .t-flame {
+  transform-origin: 50% 100%;
+  animation: flicker 1.4s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  50% {
+    transform: scaleY(1.18) rotate(4deg);
+  }
+}
+
+.tera .t-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 4.2s infinite;
+}
+
+@keyframes blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+.tera .t-eyes-closed,
+.tera .t-mouth-o,
+.tera .t-acc {
+  display: none;
+}
+
+.tera .t-arm-r {
+  transform-origin: 20% 80%;
+}
+.tera .t-arm-l {
+  transform-origin: 80% 80%;
+}
+
+.mascot.show .tera {
+  animation: hop 0.6s var(--ease);
+}
+
+@keyframes hop {
+  40% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Aksi */
+.m-wave .t-arm-r {
+  animation: wave-arm 0.5s ease-in-out 4 alternate;
+}
+@keyframes wave-arm {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(-55deg) translate(2px, -6px);
+  }
+}
+
+.m-sleep .t-eyes,
+.m-pray .t-eyes,
+.m-love .t-eyes,
+.m-cheer .t-eyes {
+  display: none;
+}
+.m-sleep .t-eyes-closed,
+.m-pray .t-eyes-closed,
+.m-love .t-eyes-closed,
+.m-cheer .t-eyes-closed {
+  display: inline;
+}
+.m-sleep .t-zzz {
+  display: inline;
+  animation: float 2s ease-in-out infinite;
+}
+.m-sleep .tera {
+  animation: breathe 3s ease-in-out infinite !important;
+}
+@keyframes breathe {
+  50% {
+    transform: scale(1.04, 0.97);
+  }
+}
+
+.m-drink .t-cup {
+  display: inline;
+  animation: sip 1.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes sip {
+  50% {
+    transform: rotate(-25deg) translate(-6px, -4px);
+  }
+}
+
+.m-dance .tera {
+  animation: dance 0.5s ease-in-out infinite alternate !important;
+}
+.m-dance .t-notes {
+  display: inline;
+  animation: float 1.2s ease-in-out infinite;
+}
+@keyframes dance {
+  from {
+    transform: rotate(-8deg) translateY(0);
+  }
+  to {
+    transform: rotate(8deg) translateY(-4px);
+  }
+}
+
+.m-read .t-book {
+  display: inline;
+}
+.m-read .t-arm {
+  display: none;
+}
+
+.m-shock .t-mouth-smile {
+  display: none;
+}
+.m-shock .t-mouth-o,
+.m-shock .t-sweat {
+  display: inline;
+}
+.m-shock .tera {
+  animation: shake 0.12s linear 6 !important;
+}
+@keyframes shake {
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+.m-love .t-hearts,
+.m-cheer .t-spark {
+  display: inline;
+  animation: float 1.6s ease-in-out infinite;
+}
+.m-cheer .t-arm {
+  animation: cheer 0.4s ease-in-out infinite alternate;
+}
+@keyframes cheer {
+  to {
+    transform: translateY(-8px);
+  }
+}
+
+.m-pray .t-arm-l {
+  transform: translate(14px, 0);
+}
+.m-pray .t-arm-r {
+  transform: translate(-14px, 0);
+}
+
+.m-think .t-eyes {
+  transform: translate(2px, -2px);
+}
+.m-think .tera {
+  animation: tilt 2.4s ease-in-out infinite !important;
+}
+@keyframes tilt {
+  50% {
+    transform: rotate(-6deg);
+  }
+}
+
+@keyframes float {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.bubble {
+  position: absolute;
+  top: 62px;
+  left: 0;
+  max-width: 230px;
+  padding: 8px 12px;
+  border-radius: 14px 14px 14px 4px;
+  background: #fff7ea;
+  color: #2b1a10;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(-6px) scale(0.92);
+  transform-origin: top left;
+  transition: opacity 0.3s 0.1s, transform 0.4s 0.1s var(--ease);
+  pointer-events: none;
+}
+
+.bubble.show {
+  opacity: 1;
+  transform: none;
+}
+
+/* Saat dibuka di browser biasa untuk pratinjau */
+body.preview {
+  background: linear-gradient(180deg, #e9efff 0%, #9aa8ff 45%, #5b48e8 75%, #0b0820 100%);
+}
