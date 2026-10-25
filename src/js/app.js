@@ -31,7 +31,6 @@ const DEFAULTS = {
   eyes: true,
   minimal: true,
   miniLyrics: true,
-  glass: true,
   prayerSrc: "online",
   myqId: null,
   myqName: "",
@@ -235,7 +234,6 @@ function syncInteractive() {
     lastRects = json;
     invoke("set_interactive", { rects: JSON.parse(json) });
   }
-  syncGlass(r, z);
   // Tera selalu menempel di sisi kanan notch (di luar lengkungan telinga).
   // Posisi style dihitung dalam satuan sebelum zoom.
   const left = r.right / z + 14;
@@ -244,44 +242,6 @@ function syncInteractive() {
   bubble.style.left = `${Math.min(left + 104, window.innerWidth / z - bubble.offsetWidth - 6)}px`;
 }
 setInterval(syncInteractive, 60);
-
-// Kaca buram: jendela dipotong mengikuti bentuk notch (dan kartu maskot) yang sedang tampil.
-let lastShapes = "";
-function syncGlass(r, z) {
-  const shapes = [];
-  if (r.width > 1 && r.height > 1) {
-    const radius = parseFloat(getComputedStyle(notch.querySelector(".body")).borderBottomLeftRadius) || 0;
-    shapes.push({ x: r.left, y: 0, w: r.width, h: r.bottom, r: Math.min(radius * z, r.height / 2), top: true });
-  }
-  if (mascot.isVisible()) {
-    for (const el of [$("mascot"), $("bubble")]) {
-      const m = el.getBoundingClientRect();
-      if (m.width > 1) shapes.push({ x: m.left, y: m.top, w: m.width, h: m.height, r: 10 * z, top: false });
-    }
-  }
-  const key = JSON.stringify([settings.glass, shapes.map((o) => Object.values(o).map((v) => (typeof v === "number" ? Math.round(v) : v)))]);
-  if (key === lastShapes) return;
-  lastShapes = key;
-  invoke("set_glass", { on: !!settings.glass, shapes });
-}
-
-// Selama notch beranimasi, bentuk jendela diperbarui tiap frame supaya tidak terpotong.
-let animating = 0;
-function frameSync() {
-  syncInteractive();
-  if (animating > 0) requestAnimationFrame(frameSync);
-}
-for (const el of [notch, $("mascot"), $("bubble")]) {
-  el.addEventListener("transitionstart", () => {
-    if (animating++ === 0) requestAnimationFrame(frameSync);
-  });
-  const done = () => {
-    animating = Math.max(0, animating - 1);
-    syncInteractive();
-  };
-  el.addEventListener("transitionend", done);
-  el.addEventListener("transitioncancel", done);
-}
 
 /* ================= Kartu sekilas (peek) ================= */
 
@@ -1520,7 +1480,6 @@ function renderMini() {
   notch.classList.toggle("dozing", showEyes && idleLevel === 2);
   notch.classList.toggle("waving", showEyes && waving && idleLevel === 0);
   notch.classList.toggle("minimal", !!settings.minimal);
-  document.body.classList.toggle("no-glass", !settings.glass);
   notch.classList.toggle("has-text", !!text);
   notch.classList.toggle("wide", !!text && !expanded && !peekCur);
   notch.classList.toggle("glow", prayerSoon && !peekCur);
@@ -1622,7 +1581,6 @@ function initSettings() {
     ["setMiniLyrics", "miniLyrics"],
     ["setNotifPeek", "notifPeek"],
     ["setOverlays", "overlays"],
-    ["setGlass", "glass"],
   ]) {
     $(id).checked = !!settings[key];
     $(id).addEventListener("change", (e) => {

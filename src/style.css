@@ -2497,3 +2497,59 @@ select {
 .w-right {
   margin-right: 22px;
 }
+
+/* =====================================================================
+   v1.2.1: frosted digambar di dalam notch sendiri.
+   Windows tidak bisa memburamkan desktop hanya di bentuk notch, jadi kaca
+   buram dibuat dari gradasi warna lembut + butiran halus, tanpa blur jendela.
+   ===================================================================== */
+
+:root {
+  --frost-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --frost:
+    var(--frost-grain),
+    radial-gradient(90% 130% at 12% 0%, rgba(255, 168, 112, 0.32), transparent 60%),
+    radial-gradient(90% 130% at 90% 100%, rgba(110, 160, 255, 0.3), transparent 60%),
+    radial-gradient(60% 90% at 55% 40%, rgba(190, 140, 255, 0.16), transparent 70%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.06) 42%, rgba(255, 255, 255, 0.02) 100%),
+    rgba(38, 36, 52, 0.94);
+}
+
+#notch .body {
+  background: var(--frost);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+#notch.expanded.lyrics-mode .body {
+  background:
+    var(--frost-grain),
+    radial-gradient(90% 130% at 12% 0%, rgba(140, 170, 255, 0.28), transparent 60%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.18), transparent 42%),
+    linear-gradient(180deg, rgba(14, 22, 62, 0.95) 0%, rgba(30, 64, 150, 0.95) 100%);
+}
+
+#notch.peeking[data-theme] .body {
+  background:
+    var(--frost-grain),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.18), transparent 42%),
+    var(--g);
+}
+
+#notch.idle .body {
+  background:
+    var(--frost-grain),
+    radial-gradient(120% 70% at 20% 120%, rgba(0, 200, 255, 0.85), transparent 60%),
+    radial-gradient(120% 70% at 80% 120%, rgba(140, 70, 255, 0.85), transparent 60%),
+    rgba(30, 28, 44, 0.95);
+}
+
+/* Spidey muncul tanpa kartu/latar: hanya sprite dan benang jaringnya */
+.mascot,
+body.no-glass .mascot {
+  background: none;
+  border: 0;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  filter: drop-shadow(0 3px 0 rgba(13, 11, 20, 0.55));
+}
