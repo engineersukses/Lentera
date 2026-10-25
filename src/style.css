@@ -2792,3 +2792,17 @@ body.no-glass .mascot {
   letter-spacing: -0.2px;
   white-space: nowrap;
 }
+
+/* Halaman sholat lebih lebar: kartu waktu tidak lagi terpotong */
+#notch.expanded[data-page="prayer"]:not(.lyrics-mode) {
+  --w: 730px;
+}
+
+.pcard {
+  padding: 9px 5px;
+}
+
+.pcard .pt {
+  font-size: 19px;
+  white-space: nowrap;
+}

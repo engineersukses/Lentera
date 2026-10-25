@@ -129,7 +129,8 @@ let pinUntil = 0;
 let collapseTimer = null;
 
 const lyricsMode = () => expanded && !settingsOpen && page === "music" && settings.lyricsOpen;
-const expandedSize = () => ({ w: lyricsMode() ? 820 : 660, h: 228 });
+// Halaman sholat sedikit lebih lebar supaya enam kartu waktunya muat.
+const expandedSize = () => ({ w: lyricsMode() ? 820 : notch.dataset.page === "prayer" ? 730 : 660, h: 228 });
 
 function applyLyricsMode() {
   notch.classList.toggle("lyrics-mode", lyricsMode());
