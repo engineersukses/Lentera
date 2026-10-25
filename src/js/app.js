@@ -29,6 +29,7 @@ const DEFAULTS = {
   prayerSound: true,
   mascotEvery: 4,
   eyes: true,
+  realBlur: true,
   minimal: true,
   miniLyrics: true,
   prayerSrc: "online",
@@ -243,6 +244,32 @@ function syncInteractive() {
   bubble.style.left = `${Math.min(left + 104, window.innerWidth / z - bubble.offsetWidth - 6)}px`;
 }
 setInterval(syncInteractive, 60);
+
+/* ================= Kaca buram asli ================= */
+
+// Jendela blur terpisah diletakkan tepat di bawah notch dan mengikuti
+// ukurannya setiap frame, supaya aplikasi di belakang notch terlihat buram.
+let lastFrost = "";
+const notchBody = notch.querySelector(".body");
+function syncFrost() {
+  requestAnimationFrame(syncFrost);
+  if (!isTauri) return;
+  const z = zoom();
+  const r = notch.getBoundingClientRect();
+  const thin = notch.classList.contains("collapsed") && notch.classList.contains("minimal") && !notch.classList.contains("wide");
+  const show = !!settings.realBlur && !thin;
+  const rad = (parseFloat(getComputedStyle(notchBody).borderBottomLeftRadius) || 0) * z;
+  const args = { x: r.left, y: r.top, w: r.width, h: r.height, r: rad, show };
+  const key = JSON.stringify(Object.values(args).map((v) => (typeof v === "number" ? Math.round(v) : v)));
+  if (key === lastFrost) return;
+  lastFrost = key;
+  invoke("set_frost", args)
+    .then((ok) => document.documentElement.classList.toggle("real-frost", !!ok && !!settings.realBlur))
+    .catch(() => document.documentElement.classList.remove("real-frost"));
+}
+requestAnimationFrame(syncFrost);
+// Kirim ulang tiap detik: menjaga urutan tumpukan dan muncul lagi setelah Show / Hide.
+setInterval(() => (lastFrost = ""), 1000);
 
 /* ================= Kartu sekilas (peek) ================= */
 
@@ -1494,7 +1521,7 @@ function renderMini() {
   // Prioritas teks: sholat sebentar lagi > timer berjalan > lirik.
   let text = "";
   if (prayerSoon) text = `<span style="color:${st.color}">${st.icon} ${next.name} in ${Math.max(1, Math.ceil(minsToPrayer))} min</span>`;
-  else if (timer.cd.running) text = `<span style="color:#ff4b55">⏱ ${hms(cdLeft())}</span>${timer.cd.label ? ` · ${esc(timer.cd.label)}` : ""}`;
+  else if (timer.cd.running) text = `<span style="color:#ff4b55">⏱ ${hms(cdLeft())}</span>${timer.cd.label ? `<span class="tlabel"> · ${esc(timer.cd.label)}</span>` : ""}`;
   else if (timer.sw.startAt != null) text = `<span style="color:#5ab4ff">⏱ ${hms(swElapsed(), true)}</span>`;
   // Mode garis tipis: lirik tidak dimunculkan supaya notch tetap jadi garis saat tidak dipakai.
   else if (settings.miniLyrics && !settings.minimal && playing && lyrics.lines.length) text = esc(lyrics.lines[currentLyricIndex()]?.text || "♪");
@@ -1506,6 +1533,7 @@ function renderMini() {
   notch.classList.toggle("waving", showEyes && waving && idleLevel === 0);
   notch.classList.toggle("minimal", !!settings.minimal);
   notch.classList.toggle("has-text", !!text);
+  notch.classList.toggle("timer-text", !prayerSoon && (timer.cd.running || timer.sw.startAt != null));
   notch.classList.toggle("wide", !!text && !expanded && !peekCur);
   notch.classList.toggle("glow", prayerSoon && !peekCur);
   if (prayerSoon) notch.style.setProperty("--accent", st.color);
@@ -1602,6 +1630,7 @@ function initSettings() {
   for (const [id, key] of [
     ["setPrayerSound", "prayerSound"],
     ["setEyes", "eyes"],
+    ["setRealBlur", "realBlur"],
     ["setMinimal", "minimal"],
     ["setMiniLyrics", "miniLyrics"],
     ["setNotifPeek", "notifPeek"],
