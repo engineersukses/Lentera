@@ -1,7 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Lentera",
-  "version": "1.3.2",
+  "productName": "Spidey",
+  "mainBinaryName": "Spidey",
+  "version": "1.4.0",
   "identifier": "id.claudia.lentera",
   "build": {
     "frontendDist": "../src"
@@ -11,7 +12,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Lentera",
+        "title": "Spidey",
         "width": 1000,
         "height": 480,
         "resizable": false,

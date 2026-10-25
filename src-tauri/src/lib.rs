@@ -180,7 +180,7 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     let autostart_item = autostart.clone();
     TrayIconBuilder::with_id("main")
         .icon(app.default_window_icon().cloned().expect("ikon aplikasi"))
-        .tooltip("Lentera")
+        .tooltip("Spidey")
         .menu(&menu)
         .on_menu_event(move |app, event| match event.id().as_ref() {
             "toggle" => {
@@ -249,5 +249,5 @@ pub fn run() {
             Ok(())
         })
         .run(tauri::generate_context!())
-        .expect("gagal menjalankan Lentera");
+        .expect("gagal menjalankan Spidey");
 }

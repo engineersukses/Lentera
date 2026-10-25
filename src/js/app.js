@@ -956,9 +956,9 @@ function renderNotifs() {
     html = `<li class="empty">${
       notifAccess === "denied"
         ? "Notification access denied. Allow it in Windows Settings → Privacy & security → Notifications."
-        : "Windows doesn't let Lentera read other apps' notifications on this device yet."
+        : "Windows doesn't let Spidey read other apps' notifications on this device yet."
     }</li>`;
-  } else if (!notifs.length) html = `<li class="empty">No new notifications since Lentera started.</li>`;
+  } else if (!notifs.length) html = `<li class="empty">No new notifications since Spidey started.</li>`;
   else
     html = notifs
       .map((n) => `<li><div class="na"><span>${esc(n.app)}</span><span>${hm(n.at)}</span></div><div class="nt">${esc(n.title)}</div><div class="nb">${esc(n.body)}</div></li>`)
@@ -1662,7 +1662,7 @@ function initSettings() {
       e.target.textContent = "Sure? Click again to erase";
       setTimeout(() => {
         armed = false;
-        e.target.textContent = "Erase all Lentera data";
+        e.target.textContent = "Erase all Spidey data";
       }, 4000);
       return;
     }
@@ -1711,7 +1711,7 @@ pollNotifs();
 prayerReminders();
 todoAlerts();
 
-// Sapaan pertama setelah Lentera dibuka.
+// Sapaan pertama setelah Spidey dibuka.
 setTimeout(() => {
   const [a, t] = chooseLine({ ...mascotContext(), music: null, todoLeft: 0, waterPct: null });
   mascotSay(a === "sleep" ? "sleep" : "wave", t, 6000);

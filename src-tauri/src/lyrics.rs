@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
-const UA: &str = "Lentera/1.0 (https://github.com/; aplikasi notch Windows)";
+const UA: &str = "Spidey/1.4 (https://github.com/; aplikasi notch Windows)";
 
 #[derive(Serialize, Clone)]
 pub struct Lyrics {

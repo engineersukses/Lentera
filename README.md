@@ -1,4 +1,6 @@
-# Lentera
+# Spidey (dulu Lentera)
+
+![Logo Spidey](src-tauri/icons/icon.png)
 
 Notch kecil yang "hidup" di tengah atas layar Windows, mirip Dynamic Island.
 Arahkan kursor ke notch untuk membuka panel lengkap.
@@ -41,7 +43,7 @@ Aplikasi ini dibuat dengan [Tauri 2](https://tauri.app) (Rust + tampilan HTML/CS
 1. Buat repo GitHub baru dan unggah isi folder ini.
 2. GitHub Actions otomatis menjalankan `.github/workflows/build.yml`.
 3. Setelah selesai (±10 menit), buka tab **Actions** → run terbaru → unduh
-   **Lentera-installer**. Di dalamnya ada `Lentera_1.0.0_x64-setup.exe`.
+   **Spidey-installer**. Di dalamnya ada `Spidey_<versi>_x64-setup.exe`.
 
 ### Cara 2: di komputer Windows sendiri
 
