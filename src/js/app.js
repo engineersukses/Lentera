@@ -87,6 +87,7 @@ function setPage(p) {
   if (p === "shelf") renderShelf();
   if (p === "music") lyricsBuiltFor = "";
   if (p !== "timer") $("fEdit").hidden = true;
+  if (p !== "water" && !$("waterSet").hidden) waterAdjust(false);
   applyLyricsMode();
   renderAll();
 }
@@ -1003,12 +1004,15 @@ $("waterUndo").addEventListener("click", () => {
   saveWater();
   renderWater();
 });
-$("waterSetBtn").addEventListener("click", () => {
-  $("waterSet").hidden = !$("waterSet").hidden;
-  $("waterChart").hidden = !$("waterSet").hidden;
-  $("waterSetBtn").classList.toggle("light", !$("waterSet").hidden);
-  renderWater();
-});
+// "Adjust" membuka pengaturan air sebagai halaman tersendiri di dalam panel.
+function waterAdjust(on) {
+  $("waterSet").hidden = !on;
+  $("waterChart").hidden = on;
+  document.querySelector(".water").classList.toggle("adjusting", on);
+  renderAll();
+}
+$("waterSetBtn").addEventListener("click", () => waterAdjust(true));
+$("waterSetDone").addEventListener("click", () => waterAdjust(false));
 $("wSwitch").addEventListener("click", () => {
   water.enabled = !water.enabled;
   water.lastRemind = Date.now();
@@ -1169,6 +1173,7 @@ $("todoList").addEventListener("click", (e) => {
 
 const doneToday = (t) => t.done && t.doneAt && todayKey(new Date(t.doneAt)) === todayKey();
 
+let lastTodoHtml = "";
 function renderTodos() {
   // Tugas yang selesai di hari sebelumnya disembunyikan (dan dibuang dari daftar).
   const before = todos.length;
@@ -1180,16 +1185,36 @@ function renderTodos() {
     ? todos
         .map(
           (t) =>
-            `<li data-id="${t.id}" class="${t.done ? "done" : ""}"><span class="check">${t.done ? icon("i-check") : ""}</span><span class="tt">${esc(t.text)}</span>${
+            `<li data-id="${t.id}" class="${t.done ? "done" : ""}"><span class="check">${t.done ? icon("i-check") : ""}</span><span class="tt"><span class="tt-in">${esc(t.text)}</span></span>${
               t.time ? `<span class="ttime">${esc(t.time)}</span>` : ""
             }<button class="act edit" title="Edit">${icon("i-pencil")}</button><button class="act del" title="Delete">${icon("i-x")}</button></li>`,
         )
         .join("")
     : `<li class="empty">No tasks yet. Click "Add" ✍️</li>`;
-  setHtml($("todoList"), html);
+  // Bandingkan dengan HTML terakhir (bukan innerHTML), karena teks berjalan mengubah isi baris.
+  if (html !== lastTodoHtml) {
+    lastTodoHtml = html;
+    $("todoList").innerHTML = html;
+  }
+  if (expanded && page === "todo") marqueeTodos();
   const pending = todos.filter((t) => !t.done).length;
   const dt = todos.filter(doneToday).length;
   $("todoScore").textContent = `${dt}/${dt + pending}`;
+}
+
+// Nama tugas yang lebih panjang dari barisnya bergulir terus (seperti teks berjalan).
+function marqueeTodos() {
+  for (const tt of $("todoList").querySelectorAll(".tt")) {
+    const inner = tt.firstElementChild;
+    if (!inner || tt.classList.contains("marquee")) continue;
+    if (tt.scrollWidth <= tt.clientWidth + 1) continue;
+    const text = inner.textContent;
+    tt.classList.add("marquee");
+    tt.innerHTML = `<span class="tt-run"><span>${esc(text)}</span><span aria-hidden="true">${esc(text)}</span></span>`;
+    // Kecepatan tetap ±40 px/detik, berapa pun panjang namanya.
+    const w = tt.querySelector(".tt-run > span").offsetWidth;
+    tt.style.setProperty("--dur", `${Math.max(4, w / 40)}s`);
+  }
 }
 
 // Ingatkan tugas yang punya jam.
@@ -1503,7 +1528,7 @@ function titleFor(p) {
     const st = PRAYER_STYLE[upcomingPrayer().key];
     return `Prayer <em style="color:${st.color}">Times</em>`;
   }
-  if (p === "water") return `Drink <em style="color:#2f8cff">Water</em>`;
+  if (p === "water") return $("waterSet").hidden ? `Drink <em style="color:#2f8cff">Water</em>` : `Water <em style="color:#2f8cff">Settings</em>`;
   if (p === "shelf") return "Shelf";
   if (p === "todo") return `To-do <em style="color:#32d74b">List</em>`;
   if (p === "notif") return "Notifications";

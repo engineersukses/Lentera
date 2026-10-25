@@ -2553,3 +2553,207 @@ body.no-glass .mascot {
   backdrop-filter: none;
   filter: drop-shadow(0 3px 0 rgba(13, 11, 20, 0.55));
 }
+
+/* =====================================================================
+   v1.2.2: ukuran halaman dikunci supaya isi tidak keluar dari notch
+   ===================================================================== */
+
+.page > * {
+  min-width: 0;
+}
+
+/* ---------- To-do: lebar pasti, nama panjang bergulir ---------- */
+.todo {
+  flex: 0 0 548px;
+  width: 548px;
+  max-width: 100%;
+  overflow: hidden;
+  gap: 18px;
+  padding-left: 8px;
+}
+
+.t-left {
+  flex: 0 0 204px;
+  width: 204px;
+}
+
+.t-right {
+  flex: 0 0 300px;
+  width: 300px;
+  overflow: hidden;
+}
+
+.t-list {
+  overflow-x: hidden;
+}
+
+.t-list li[data-id] {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.t-list .tt {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.t-list .tt.marquee {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.tt-run {
+  display: inline-flex;
+  animation: marquee var(--dur, 8s) linear infinite;
+}
+
+.tt-run > span {
+  padding-right: 40px;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.t-form #todoInput {
+  width: 0;
+}
+
+/* ---------- Drink Water: pengaturan sebagai halaman sendiri ---------- */
+.water {
+  max-width: 548px;
+  overflow: hidden;
+}
+
+.water.adjusting .w-left {
+  display: none;
+}
+
+.water.adjusting .w-right {
+  flex: 1;
+  margin-right: 0;
+  padding-left: 0;
+  border-left: 0;
+}
+
+.water.adjusting {
+  padding-left: 8px;
+}
+
+.w-set:not([hidden]) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 22px;
+  align-content: center;
+  height: 100%;
+}
+
+.ws-head {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 19px;
+}
+
+.ws-head .pill {
+  height: 32px;
+}
+
+.ws-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 15px;
+}
+
+.ws-row .chips {
+  flex-wrap: wrap;
+}
+
+.ws-row .chips button {
+  font-size: 15px;
+  padding: 2px 9px;
+}
+
+.ws-row .hours input {
+  width: 52px;
+  height: 28px;
+  font-size: 15px;
+}
+
+.ws-row select {
+  height: 30px;
+  font-size: 15px;
+}
+
+.ws-row:last-child {
+  grid-column: 1 / -1;
+  flex-direction: row;
+}
+
+/* Pengaturan air: 2 kolom pengaturan + kolom tombol di kanan */
+.w-set:not([hidden]) {
+  grid-template-columns: auto auto auto;
+  gap: 10px 20px;
+}
+
+.ws-row {
+  font-size: 13px;
+}
+
+.ws-row .chips button {
+  font-size: 14px;
+  padding: 2px 8px;
+}
+
+.ws-head {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+}
+
+.ws-head .link {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.w-set:not([hidden]) {
+  grid-template-columns: max-content max-content 1fr;
+}
+
+.ws-row .chips {
+  flex-wrap: nowrap;
+}
+
+.ws-row .hours input {
+  width: 62px;
+}
+
+/* Baris tombol (Undo + Done) di bawah, dua kolom pengaturan di atas */
+.w-set:not([hidden]) {
+  grid-template-columns: max-content max-content;
+  justify-content: space-between;
+  gap: 8px 24px;
+}
+
+.ws-head {
+  grid-column: 1 / -1;
+  grid-row: auto;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ws-head .pill {
+  height: 30px;
+}
