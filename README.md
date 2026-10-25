@@ -11,9 +11,7 @@ gelombang suara; panel terbuka dengan panah kiri/kanan dan titik halaman
 Fitur tambahan ditandai ✨. Semua teks di aplikasi berbahasa Inggris.
 
 Saat tidak dipakai, notch mengecil jadi garis hitam tipis. Ukuran notch dikunci di 60% dengan
-huruf yang diperbesar. Gayanya kaca buram (frosted): jendela blur kecil diletakkan tepat di
-bawah notch, jadi aplikasi apa pun yang ada di belakang notch ikut terlihat buram (bisa dimatikan di
-Settings, "Blur apps behind the notch"). Ditambah sentuhan komik pixel: huruf Pixelify Sans, garis tinta goresan tangan, titik raster.
+huruf yang diperbesar. Gayanya kaca buram (frosted, digambar di dalam notch) dengan sentuhan komik pixel: huruf Pixelify Sans, garis tinta goresan tangan, titik raster.
 Settings dibuka lewat ikon gerigi di kiri atas panel.
 
 | Fitur | Keterangan |

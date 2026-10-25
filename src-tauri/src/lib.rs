@@ -1,4 +1,3 @@
-mod frost;
 mod lyrics;
 mod system;
 
@@ -23,14 +22,6 @@ struct Rect {
 
 #[derive(Default)]
 struct Interactive(Mutex<Vec<Rect>>);
-
-/// Atur posisi/ukuran kaca buram di belakang notch. Mengembalikan false
-/// kalau kaca buram tidak tersedia.
-#[tauri::command]
-#[allow(clippy::too_many_arguments)]
-fn set_frost(app: AppHandle, x: f64, y: f64, w: f64, h: f64, r: f64, show: bool) -> bool {
-    frost::set(&app, x, y, w, h, r, show)
-}
 
 #[tauri::command]
 fn set_interactive(rects: Vec<Rect>, state: State<Interactive>) {
@@ -196,7 +187,6 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
                 if let Some(w) = app.get_webview_window("main") {
                     if w.is_visible().unwrap_or(true) {
                         let _ = w.hide();
-                        frost::hide(app);
                     } else {
                         let _ = w.show();
                     }
@@ -236,7 +226,6 @@ pub fn run() {
         .manage(system::NotificationState::default())
         .invoke_handler(tauri::generate_handler![
             set_interactive,
-            set_frost,
             media_info,
             media_control,
             system_status,
@@ -257,9 +246,6 @@ pub fn run() {
             start_click_through(app.handle().clone());
             system::watch_input(app.handle().clone());
             build_tray(app.handle())?;
-            if let Err(e) = frost::create(app.handle()) {
-                eprintln!("kaca buram tidak tersedia: {e}");
-            }
             Ok(())
         })
         .run(tauri::generate_context!())

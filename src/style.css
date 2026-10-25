@@ -2760,7 +2760,7 @@ body.no-glass .mascot {
 
 /* =====================================================================
    v1.3: nama sholat tidak menabrak kartu, angka timer di notch tertutup
-   lebih besar, dan kaca buram asli (jendela blur di belakang notch).
+   lebih besar.
    ===================================================================== */
 
 .pr-left {
@@ -2785,28 +2785,7 @@ body.no-glass .mascot {
   font-weight: 600;
 }
 
-/* Blur asli aktif: latar notch dibuat tembus pandang supaya aplikasi di
-   belakangnya terlihat buram melalui jendela kaca di bawah notch. */
-html.real-frost {
-  --frost:
-    var(--frost-grain),
-    radial-gradient(90% 130% at 12% 0%, rgba(255, 168, 112, 0.22), transparent 60%),
-    radial-gradient(90% 130% at 90% 100%, rgba(110, 160, 255, 0.2), transparent 60%),
-    linear-gradient(165deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 42%, transparent 100%),
-    rgba(30, 28, 44, 0.5);
-}
 
-html.real-frost #notch.collapsed.minimal:not(.wide) .body {
-  background: #000;
-}
-
-html.real-frost #notch.expanded.lyrics-mode .body {
-  background:
-    var(--frost-grain),
-    radial-gradient(90% 130% at 12% 0%, rgba(140, 170, 255, 0.22), transparent 60%),
-    linear-gradient(165deg, rgba(255, 255, 255, 0.14), transparent 42%),
-    linear-gradient(180deg, rgba(14, 22, 62, 0.62) 0%, rgba(30, 64, 150, 0.62) 100%);
-}
 
 .pcard .pn {
   font-size: 11px;
