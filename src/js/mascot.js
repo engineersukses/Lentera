@@ -1,45 +1,102 @@
-// "Tera", si lentera kecil yang muncul di samping notch.
+// "Tera" versi v1.2: Spider-Man kecil bergaya pixel art yang bergelantungan
+// di benang jaring di samping notch. Sprite digambar dari peta piksel di bawah.
+
+// K tinta, R merah, D merah gelap, B biru, N biru gelap, W putih.
+const PALETTE = { K: "#0d0b14", R: "#e0262f", D: "#9e1219", B: "#2a5bd7", N: "#1a3a96", W: "#ffffff", S: "#c9d6ea" };
+
+// Separuh kiri (12 kolom) badan + kepala; dicerminkan jadi 24 kolom. Posisi terbalik: kaki di atas.
+const HALF = [
+  ".......KKKK.",
+  ".......KRRK.",
+  ".......KRRK.",
+  ".......KBBK.",
+  ".......KBBK.",
+  ".......KBNK.",
+  "......KBBNKK",
+  "......KBBBBB",
+  "......KBBBBB",
+  ".....KRRRRRR",
+  ".....KRRRKRK",
+  ".....KRRRRKK",
+  ".....KRRRKRK",
+  ".....KRRRRRR",
+  "......KKRRRR",
+  ".....KKRRRRR",
+  "...KKRRRDRRR",
+  "..KRRRRDRRRD",
+  ".KRRRRDRRRDR",
+  ".KRKKRRRRRDR",
+  "KRKWWKKRRDRR",
+  "KRKWWWWKKRRR",
+  "KRKWWWWWWKRD",
+  "KRRKWWWWWKRR",
+  ".KRKKKKKKKRR",
+  ".KRRRDRRRRRD",
+  "..KRRRRDRRRR",
+  "...KKRRRRDRR",
+  ".....KKKKKKK",
+];
+const PAD = 2; // ruang untuk lengan di kiri-kanan
+const W = 24 + PAD * 2;
+const ROWS = HALF.map((h) => ".".repeat(PAD) + h + [...h].reverse().join("") + ".".repeat(PAD));
+
+// Lengan kiri (7 kolom pertama); kanan dicerminkan. Digambar terpisah supaya bisa melambai.
+const ARM = [
+  [10, "....KKK"],
+  [11, "...KBBB"],
+  [12, "..KBBK."],
+  [13, "..KBK.."],
+  [14, ".KBBK.."],
+  [15, ".KBK..."],
+  [16, ".KBK..."],
+  [17, ".KRK..."],
+  [18, "KRRRK.."],
+  [19, "KRRRK.."],
+  [20, ".KKK..."],
+];
+
+const TOP = 8; // baris sprite dimulai di bawah benang jaring
+
+function px(x, y, c) {
+  return `<rect x="${x}" y="${y + TOP}" width="1.02" height="1.02" fill="${PALETTE[c]}"/>`;
+}
+
+function grid(rows, filter = () => true, color) {
+  let out = "";
+  rows.forEach((row, y) => [...row].forEach((c, x) => c !== "." && filter(c, x, y) && (out += px(x, y, color?.(c, x, y) ?? c))));
+  return out;
+}
+
+function arm(mirror) {
+  let out = "";
+  for (const [y, row] of ARM) [...row].forEach((c, i) => c !== "." && (out += px(mirror ? W - 1 - i : i, y, c)));
+  return out;
+}
+
+// Mata (bagian putih) dipisah supaya bisa berkedip / tertutup / membesar.
+const isEye = (c) => c === "W";
+const body = grid(ROWS, (c) => !isEye(c));
+const eyes = grid(ROWS, isEye);
+// Mata tertutup: putihnya ditutup merah, lalu satu garis tinta.
+const eyesClosed = grid(ROWS, isEye, (c, x, y) => (y === 22 ? "K" : "R"));
 
 const SVG = `
-<svg viewBox="0 0 64 72" class="tera" aria-hidden="true">
-  <defs>
-    <radialGradient id="teraBody" cx="45%" cy="40%" r="65%">
-      <stop offset="0" stop-color="#ffe2a8"/>
-      <stop offset="0.6" stop-color="#ffb259"/>
-      <stop offset="1" stop-color="#f08a3c"/>
-    </radialGradient>
-    <linearGradient id="teraFlame" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#ff8a3d"/>
-      <stop offset="1" stop-color="#ffe9a6"/>
-    </linearGradient>
-  </defs>
-  <g class="t-flame"><path d="M32 4 C26 12 26 17 32 20 C38 17 38 12 32 4 Z" fill="url(#teraFlame)"/></g>
-  <g class="t-body">
-    <path d="M32 18 C49 18 56 30 56 44 C56 59 46 66 32 66 C18 66 8 59 8 44 C8 30 15 18 32 18 Z" fill="url(#teraBody)"/>
-    <g class="t-eyes">
-      <ellipse class="t-eye" cx="24" cy="41" rx="3.6" ry="4.6" fill="#2b1a10"/>
-      <ellipse class="t-eye" cx="40" cy="41" rx="3.6" ry="4.6" fill="#2b1a10"/>
-      <circle cx="25.2" cy="39.4" r="1.3" fill="#fff"/>
-      <circle cx="41.2" cy="39.4" r="1.3" fill="#fff"/>
-    </g>
-    <g class="t-eyes-closed">
-      <path d="M20 42 Q24 45 28 42" stroke="#2b1a10" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <path d="M36 42 Q40 45 44 42" stroke="#2b1a10" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    </g>
-    <ellipse cx="17" cy="49" rx="4" ry="2.5" fill="#ff7d8a" opacity=".55"/>
-    <ellipse cx="47" cy="49" rx="4" ry="2.5" fill="#ff7d8a" opacity=".55"/>
-    <path class="t-mouth t-mouth-smile" d="M28 50 Q32 54 36 50" stroke="#2b1a10" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    <ellipse class="t-mouth t-mouth-o" cx="32" cy="52" rx="2.6" ry="3.2" fill="#2b1a10"/>
+<svg viewBox="0 0 ${W} ${ROWS.length + TOP + 1}" class="tera" shape-rendering="crispEdges" aria-hidden="true">
+  <g class="t-swing">
+    <rect class="t-web" x="${W / 2 - 0.4}" y="-80" width="0.8" height="${80 + TOP + 1}" fill="#f4f4f8"/>
+    <g class="t-body">${body}</g>
+    <g class="t-eyes">${eyes}</g>
+    <g class="t-eyes-closed">${eyesClosed}</g>
+    <g class="t-arm t-arm-l">${arm(false)}</g>
+    <g class="t-arm t-arm-r">${arm(true)}</g>
+    <g class="t-acc t-cup"><rect x="${W - 5}" y="${20 + TOP}" width="4" height="5" fill="#7cc8ff"/><rect x="${W - 5}" y="${20 + TOP}" width="4" height="1" fill="#e8f6ff"/></g>
+    <g class="t-acc t-book"><rect x="6" y="${25 + TOP}" width="16" height="4" fill="#ffd34d"/><rect x="${W / 2 - 0.5}" y="${25 + TOP}" width="1" height="4" fill="${PALETTE.K}"/></g>
   </g>
-  <g class="t-arm t-arm-l"><ellipse cx="9" cy="44" rx="5" ry="7" fill="#f59a47"/></g>
-  <g class="t-arm t-arm-r"><ellipse cx="55" cy="44" rx="5" ry="7" fill="#f59a47"/></g>
-  <g class="t-acc t-cup"><rect x="44" y="44" width="11" height="13" rx="2" fill="#7cc8ff"/><rect x="44" y="44" width="11" height="4" rx="1.5" fill="#d8f0ff"/></g>
-  <g class="t-acc t-book"><path d="M16 50 L32 54 L48 50 L48 62 L32 66 L16 62 Z" fill="#6aa7ff"/><path d="M32 54 L32 66" stroke="#2f5fb3" stroke-width="1.5"/></g>
-  <g class="t-acc t-zzz"><text x="46" y="18" font-size="10" fill="#cfd8ff" font-weight="700">z</text><text x="53" y="10" font-size="8" fill="#cfd8ff" font-weight="700">z</text></g>
-  <g class="t-acc t-notes"><text x="50" y="20" font-size="12" fill="#ffd36e">♪</text><text x="4" y="26" font-size="10" fill="#ff9fd2">♫</text></g>
-  <g class="t-acc t-hearts"><text x="48" y="20" font-size="11" fill="#ff6b8b">♥</text><text x="6" y="24" font-size="8" fill="#ff6b8b">♥</text></g>
-  <g class="t-acc t-sweat"><path d="M50 28 C48 32 48 34 50 35 C52 34 52 32 50 28 Z" fill="#8fd3ff"/></g>
-  <g class="t-acc t-spark"><text x="48" y="20" font-size="11" fill="#fff3a0">✦</text><text x="6" y="22" font-size="8" fill="#fff3a0">✦</text></g>
+  <g class="t-acc t-zzz"><text x="${W - 7}" y="14" font-size="6" fill="#cfd8ff" font-weight="700">z</text><text x="${W - 3}" y="8" font-size="5" fill="#cfd8ff" font-weight="700">z</text></g>
+  <g class="t-acc t-notes"><text x="${W - 7}" y="16" font-size="7" fill="#ffd36e">♪</text><text x="0" y="20" font-size="6" fill="#ff9fd2">♫</text></g>
+  <g class="t-acc t-hearts"><text x="${W - 7}" y="16" font-size="7" fill="#ff4b6b">♥</text><text x="1" y="20" font-size="5" fill="#ff4b6b">♥</text></g>
+  <g class="t-acc t-sweat"><rect x="${W - 4}" y="${16 + TOP}" width="1" height="2" fill="#8fd3ff"/></g>
+  <g class="t-acc t-spark"><text x="${W - 7}" y="15" font-size="6" fill="#fff3a0">✦</text><text x="0" y="17" font-size="5" fill="#fff3a0">✦</text></g>
 </svg>`;
 
 export const ACTIONS = ["wave", "sleep", "drink", "dance", "read", "shock", "love", "pray", "think", "cheer"];
@@ -60,14 +117,15 @@ export function chooseLine(ctx) {
   const options = [];
 
   options.push(["wave", `${greetingByHour(h)}${name}! 👋`]);
-  options.push(["wave", pick([`Hi${name}! I'll keep you company here.`, `Hello${name}~ what are you up to?`, "Check check, Tera is here! ✨"])]);
+  options.push(["wave", pick([`Hi${name}! I'll keep you company here.`, `Hello${name}~ what are you up to?`, "Your friendly neighborhood notch! 🕷️"])]);
   options.push(["think", pick(["Hmm... thinking about snacks.", "If you're tired, take a short break.", "One small step is still progress."])]);
   options.push(["cheer", pick(["You got this! 💪", "You're doing great today!", "Slow and steady, just keep going."])]);
   options.push(["read", pick(["Reading for a bit... 📖", "Learning something new today."])]);
+  options.push(["wave", pick(["Just hanging around... literally 🕸️", "My spider-sense says you're doing great!", "With great power comes great productivity."])]);
   options.push(["love", pick(["Don't forget to smile today 💛", "Thank you for making it this far."])]);
 
   if (h >= 22 || h < 4) {
-    options.push(["sleep", "It's late... don't stay up too long 😴"], ["sleep", "Yawn... Tera is sleepy."]);
+    options.push(["sleep", "It's late... don't stay up too long 😴"], ["sleep", "Yawn... even Spidey needs sleep."]);
   }
   if (ctx.music?.playing && ctx.music.title) {
     options.push(["dance", `Great song! 🎶 ${ctx.music.title}`], ["dance", "Dance time~ ♪"]);
@@ -85,7 +143,7 @@ export function chooseLine(ctx) {
     options.push(["shock", `Only ${ctx.battery.percent}% battery! Find a charger 🔌`]);
   }
   if (ctx.timerRunning) {
-    options.push(["cheer", "Focus! Tera is watching the timer ⏱"]);
+    options.push(["cheer", "Focus! Spidey is guarding the timer ⏱"]);
   }
   return pick(options);
 }

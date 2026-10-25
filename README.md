@@ -10,8 +10,10 @@ gelombang suara; panel terbuka dengan panah kiri/kanan dan titik halaman
 (bisa juga digulir dengan roda mouse); kartu sekilas dengan cincin progres.
 Fitur tambahan ditandai ✨. Semua teks di aplikasi berbahasa Inggris.
 
-Saat tidak dipakai, notch mengecil jadi garis hitam tipis. Ukuran notch bisa diatur (bawaan 50%)
-di Settings, yang dibuka lewat ikon gerigi di kiri atas panel.
+Saat tidak dipakai, notch mengecil jadi garis hitam tipis. Ukuran notch dikunci di 60% dengan
+huruf yang diperbesar. Gayanya kaca buram (frosted, latar di belakang notch ikut diburamkan oleh
+Windows) dengan sentuhan komik pixel: huruf Pixelify Sans, garis tinta goresan tangan, titik raster.
+Settings dibuka lewat ikon gerigi di kiri atas panel.
 
 | Fitur | Keterangan |
 | --- | --- |
@@ -26,7 +28,7 @@ di Settings, yang dibuka lewat ikon gerigi di kiri atas panel.
 | 🔋🎧📶 Kartu sekilas | Muncul sebentar saat charger dicolok, earbuds tersambung, Wi-Fi putus, baterai lemah. |
 | 🔊⇪⌨ Tampilan kecil | Volume, Caps Lock, dan ganti bahasa keyboard (dibaca berkala, tanpa merekam ketikan). |
 | 🔔 Notifikasi ✨ | Notifikasi aplikasi lain tampil sekilas di notch dan tersimpan di tab Notif. |
-| 🪔 Tera ✨ | Karakter lentera kecil yang muncul di samping notch tiap beberapa menit: menyapa, minum, joget saat ada lagu, mengantuk saat malam, mengingatkan sholat, kaget saat baterai lemah. Bisa diklik. |
+| 🕷️ Spidey ✨ | Spider-Man kecil bergaya pixel art yang turun bergelantungan di benang jaring di samping notch tiap beberapa menit: menyapa, minum, joget saat ada lagu, mengantuk saat malam, mengingatkan sholat, kaget saat baterai lemah. Bisa diklik. |
 
 Urutan halaman: Musik, Timer, Sholat, Air, Rak, Tugas, Notifikasi, Pengaturan.
 Pengaturan ada di halaman terakhir dan di ikon tray dekat jam Windows.

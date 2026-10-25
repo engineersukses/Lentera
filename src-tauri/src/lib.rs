@@ -1,3 +1,4 @@
+mod glass;
 mod lyrics;
 mod system;
 
@@ -91,6 +92,30 @@ async fn http_json(url: String) -> Result<serde_json::Value, String> {
     })
     .await
     .map_err(|e| e.to_string())?
+}
+
+#[derive(Default)]
+struct Glass(Mutex<(bool, Vec<glass::Shape>)>);
+
+/// Hidupkan/matikan kaca buram dan potong jendela mengikuti notch.
+#[tauri::command]
+fn set_glass(on: bool, shapes: Vec<glass::Shape>, window: WebviewWindow, state: State<Glass>) {
+    let mut cur = state.0.lock().unwrap();
+    let changed_on = cur.0 != on;
+    if !changed_on && cur.1 == shapes {
+        return;
+    }
+    #[cfg(windows)]
+    if let (Ok(hwnd), Ok(scale)) = (window.hwnd(), window.scale_factor()) {
+        let hwnd = windows::Win32::Foundation::HWND(hwnd.0 as _);
+        if changed_on {
+            glass::set_blur(hwnd, on);
+        }
+        glass::set_shape(hwnd, if on { &shapes } else { &[] }, scale);
+    }
+    #[cfg(not(windows))]
+    let _ = &window;
+    *cur = (on, shapes);
 }
 
 #[tauri::command]
@@ -223,6 +248,7 @@ pub fn run() {
         .plugin(tauri_plugin_drag::init())
         .plugin(tauri_plugin_opener::init())
         .manage(Interactive::default())
+        .manage(Glass::default())
         .manage(system::NotificationState::default())
         .invoke_handler(tauri::generate_handler![
             set_interactive,
@@ -232,6 +258,7 @@ pub fn run() {
             notifications_poll,
             fetch_lyrics,
             http_json,
+            set_glass,
             file_info,
             media_seek,
             idle_ms,

@@ -31,7 +31,7 @@ const DEFAULTS = {
   eyes: true,
   minimal: true,
   miniLyrics: true,
-  scale: 0.5,
+  glass: true,
   prayerSrc: "online",
   myqId: null,
   myqName: "",
@@ -50,9 +50,10 @@ if (!settings.v2) {
 }
 
 // Ukuran notch: seluruh tampilan diperkecil dengan CSS zoom.
-const zoom = () => +settings.scale || 1;
-const applyScale = () => (document.documentElement.style.zoom = zoom());
-applyScale();
+// Ukuran notch dikunci di 60%; seluruh tampilan diperkecil dengan CSS zoom.
+const ZOOM = 0.6;
+const zoom = () => ZOOM;
+document.documentElement.style.zoom = ZOOM;
 
 /* ================= Halaman (panah kiri/kanan + titik) ================= */
 
@@ -234,14 +235,53 @@ function syncInteractive() {
     lastRects = json;
     invoke("set_interactive", { rects: JSON.parse(json) });
   }
+  syncGlass(r, z);
   // Tera selalu menempel di sisi kanan notch (di luar lengkungan telinga).
   // Posisi style dihitung dalam satuan sebelum zoom.
   const left = r.right / z + 14;
   const bubble = $("bubble");
   $("mascot").style.left = `${left}px`;
-  bubble.style.left = `${Math.min(left + 8, window.innerWidth / z - bubble.offsetWidth - 6)}px`;
+  bubble.style.left = `${Math.min(left + 104, window.innerWidth / z - bubble.offsetWidth - 6)}px`;
 }
 setInterval(syncInteractive, 60);
+
+// Kaca buram: jendela dipotong mengikuti bentuk notch (dan kartu maskot) yang sedang tampil.
+let lastShapes = "";
+function syncGlass(r, z) {
+  const shapes = [];
+  if (r.width > 1 && r.height > 1) {
+    const radius = parseFloat(getComputedStyle(notch.querySelector(".body")).borderBottomLeftRadius) || 0;
+    shapes.push({ x: r.left, y: 0, w: r.width, h: r.bottom, r: Math.min(radius * z, r.height / 2), top: true });
+  }
+  if (mascot.isVisible()) {
+    for (const el of [$("mascot"), $("bubble")]) {
+      const m = el.getBoundingClientRect();
+      if (m.width > 1) shapes.push({ x: m.left, y: m.top, w: m.width, h: m.height, r: 10 * z, top: false });
+    }
+  }
+  const key = JSON.stringify([settings.glass, shapes.map((o) => Object.values(o).map((v) => (typeof v === "number" ? Math.round(v) : v)))]);
+  if (key === lastShapes) return;
+  lastShapes = key;
+  invoke("set_glass", { on: !!settings.glass, shapes });
+}
+
+// Selama notch beranimasi, bentuk jendela diperbarui tiap frame supaya tidak terpotong.
+let animating = 0;
+function frameSync() {
+  syncInteractive();
+  if (animating > 0) requestAnimationFrame(frameSync);
+}
+for (const el of [notch, $("mascot"), $("bubble")]) {
+  el.addEventListener("transitionstart", () => {
+    if (animating++ === 0) requestAnimationFrame(frameSync);
+  });
+  const done = () => {
+    animating = Math.max(0, animating - 1);
+    syncInteractive();
+  };
+  el.addEventListener("transitionend", done);
+  el.addEventListener("transitioncancel", done);
+}
 
 /* ================= Kartu sekilas (peek) ================= */
 
@@ -340,8 +380,8 @@ function mascotSay(action, text, ms) {
 $("mascot").addEventListener("click", () => {
   const reactions = [
     ["love", "Hehe, that tickles! 😆"],
-    ["cheer", "Yay! Someone poked Tera ✨"],
-    ["wave", `Yes${settings.name ? ", " + settings.name : ""}? Tera is here!`],
+    ["cheer", "Hey! My spider-sense tingled ✨"],
+    ["wave", `Yes${settings.name ? ", " + settings.name : ""}? Spidey is here!`],
   ];
   const [a, t] = Math.random() < 0.5 ? reactions[Math.floor(Math.random() * reactions.length)] : chooseLine(mascotContext());
   mascot.show(a, t, 5000);
@@ -992,7 +1032,7 @@ function addWater(ml) {
   sounds.water();
   if (before < water.goal && waterToday() >= water.goal) {
     peek({ icon: "i-drop", ring: 100, color: "#2f8cff", iconColor: "#5ab4ff", title: "Water goal reached!", body: `${liters(water.goal)} L today`, side: "100%" });
-    mascotSay("love", "Water goal reached! Tera is proud 💙", 6000);
+    mascotSay("love", "Water goal reached! Spidey is proud 💙", 6000);
   }
   renderWater();
 }
@@ -1104,7 +1144,7 @@ function waterReminder() {
   sounds.water();
   const pct = Math.round((waterToday() / water.goal) * 100);
   peek({ icon: "i-drop", ring: pct, color: "#2f8cff", iconColor: "#5ab4ff", title: "Time to drink", body: `${liters(waterToday())} / ${liters(water.goal)} L today`, side: `${pct}%`, ms: 7000 });
-  mascotSay("drink", "Gulp gulp... drink with Tera! 💧", 6500);
+  mascotSay("drink", "Gulp gulp... drink with Spidey! 💧", 6500);
 }
 
 /* ================= To-do ================= */
@@ -1480,6 +1520,7 @@ function renderMini() {
   notch.classList.toggle("dozing", showEyes && idleLevel === 2);
   notch.classList.toggle("waving", showEyes && waving && idleLevel === 0);
   notch.classList.toggle("minimal", !!settings.minimal);
+  document.body.classList.toggle("no-glass", !settings.glass);
   notch.classList.toggle("has-text", !!text);
   notch.classList.toggle("wide", !!text && !expanded && !peekCur);
   notch.classList.toggle("glow", prayerSoon && !peekCur);
@@ -1543,12 +1584,6 @@ function fillCities(found = []) {
 function initSettings() {
   const sel = $("setCity");
   fillCities();
-  $("setScale").value = String(settings.scale);
-  $("setScale").addEventListener("change", (e) => {
-    settings.scale = +e.target.value;
-    saveSettings();
-    applyScale();
-  });
   $("setPrayerSrc").value = settings.prayerSrc;
   $("setPrayerSrc").addEventListener("change", (e) => {
     settings.prayerSrc = e.target.value;
@@ -1587,6 +1622,7 @@ function initSettings() {
     ["setMiniLyrics", "miniLyrics"],
     ["setNotifPeek", "notifPeek"],
     ["setOverlays", "overlays"],
+    ["setGlass", "glass"],
   ]) {
     $(id).checked = !!settings[key];
     $(id).addEventListener("change", (e) => {

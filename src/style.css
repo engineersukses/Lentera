@@ -26,7 +26,7 @@ body {
   background: transparent;
   overflow: hidden;
   font-family: "Segoe UI Variable Display", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
-  font-size: 13px;
+  font-size: 17px;
   color: var(--fg);
   user-select: none;
   -webkit-font-smoothing: antialiased;
@@ -237,14 +237,14 @@ svg {
 }
 
 .mini-clock {
-  font-size: 17px;
+  font-size: 22px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
 .mini-text {
   max-width: 100%;
-  font-size: 12.5px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--fg-2);
   white-space: nowrap;
@@ -368,7 +368,7 @@ svg {
   position: absolute;
   right: -16px;
   top: -8px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
   color: #cfe3ff;
   opacity: 0;
@@ -434,7 +434,7 @@ svg {
   height: 46px;
   display: grid;
   place-items: center;
-  font-size: 19px;
+  font-size: 25px;
 }
 
 .peek-ring::before {
@@ -455,7 +455,7 @@ svg {
 #notch.small .peek-ring {
   width: 30px;
   height: 30px;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 #notch.small .peek-ring::before {
@@ -470,19 +470,19 @@ svg {
 
 .peek-title {
   font-weight: 700;
-  font-size: 19px;
+  font-size: 25px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 #notch.small .peek-title {
-  font-size: 14px;
+  font-size: 18px;
 }
 
 .peek-body {
   color: var(--fg-2);
-  font-size: 14px;
+  font-size: 18px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -515,13 +515,13 @@ svg {
 
 .peek-side {
   flex: none;
-  font-size: 32px;
+  font-size: 42px;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 
 #notch.small .peek-side {
-  font-size: 16px;
+  font-size: 21px;
   font-weight: 700;
 }
 
@@ -532,7 +532,7 @@ svg {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 28px;
+  font-size: 36px;
   background: radial-gradient(circle, #0d2a36 0 55%, #0a1d26 56% 100%);
   box-shadow: inset 0 0 0 2px #1b4d63, 0 0 0 5px #0d1f28;
   color: #9fe3ff;
@@ -573,7 +573,7 @@ svg {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 19px;
+  font-size: 25px;
   color: var(--fg-2);
   transition: color 0.2s, background 0.2s;
 }
@@ -603,7 +603,7 @@ svg {
 .batt .bolt {
   display: none;
   color: var(--green);
-  font-size: 14px;
+  font-size: 18px;
 }
 
 .batt.charging .bolt {
@@ -619,25 +619,25 @@ svg {
 }
 
 .mini .batt .bolt {
-  font-size: 13px;
+  font-size: 17px;
   margin-left: -2px;
 }
 
 .pill.small {
   height: 26px;
   padding: 0 10px;
-  font-size: 12px;
+  font-size: 16px;
   flex: none;
 }
 
 .set-status {
   color: var(--fg-3);
-  font-size: 11px;
+  font-size: 14px;
   align-self: end;
 }
 
 .ptitle {
-  font-size: 19px;
+  font-size: 25px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -653,7 +653,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 17px;
+  font-size: 22px;
   white-space: nowrap;
 }
 
@@ -689,7 +689,7 @@ svg {
   color: var(--fg);
   display: grid;
   place-items: center;
-  font-size: 15px;
+  font-size: 20px;
   z-index: 2;
   transition: filter 0.15s;
 }
@@ -758,14 +758,14 @@ svg {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 500;
   white-space: nowrap;
   transition: filter 0.15s, transform 0.1s;
 }
 
 .pill svg {
-  font-size: 16px;
+  font-size: 21px;
 }
 
 .pill:hover {
@@ -797,7 +797,7 @@ svg {
   background: var(--gray);
   display: inline-grid;
   place-items: center;
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .round.ok {
@@ -807,7 +807,7 @@ svg {
 
 .link {
   color: var(--fg-2);
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .link:hover {
@@ -823,7 +823,7 @@ svg {
   align-items: center;
   gap: 6px;
   color: var(--fg-2);
-  font-size: 12px;
+  font-size: 16px;
 }
 
 input[type="text"],
@@ -876,7 +876,7 @@ input[type="checkbox"] {
   background: var(--gray) center / cover;
   display: grid;
   place-items: center;
-  font-size: 34px;
+  font-size: 44px;
   align-self: end;
 }
 
@@ -887,7 +887,7 @@ input[type="checkbox"] {
 }
 
 .ptrack {
-  font-size: 19px;
+  font-size: 25px;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -896,7 +896,7 @@ input[type="checkbox"] {
 
 .partist {
   color: var(--fg-2);
-  font-size: 14.5px;
+  font-size: 19px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -907,7 +907,7 @@ input[type="checkbox"] {
   display: flex;
   align-items: center;
   gap: 36px;
-  font-size: 16px;
+  font-size: 21px;
   font-variant-numeric: tabular-nums;
   margin-top: 6px;
 }
@@ -943,7 +943,7 @@ input[type="checkbox"] {
 }
 
 .lyr {
-  font-size: 24px;
+  font-size: 31px;
   color: var(--fg-2);
   margin-left: 32px;
 }
@@ -962,13 +962,13 @@ input[type="checkbox"] {
 }
 
 .pbtns button {
-  font-size: 20px;
+  font-size: 26px;
   display: grid;
   place-items: center;
 }
 
 .pbtns .pp {
-  font-size: 24px;
+  font-size: 31px;
 }
 
 .lyrics {
@@ -1027,7 +1027,7 @@ input[type="checkbox"] {
 
 .lyrics .l {
   padding: 6px 0;
-  font-size: 19px;
+  font-size: 25px;
   font-weight: 700;
   line-height: 1.3;
   color: rgba(255, 255, 255, 0.32);
@@ -1044,12 +1044,12 @@ input[type="checkbox"] {
 
 .lyrics .l.cur {
   color: #fff;
-  font-size: 21px;
+  font-size: 27px;
 }
 
 .lyrics .msg {
   color: var(--fg-2);
-  font-size: 15px;
+  font-size: 20px;
   padding-top: 70px;
 }
 
@@ -1057,7 +1057,7 @@ input[type="checkbox"] {
   position: absolute;
   right: 4px;
   bottom: 2px;
-  font-size: 10px;
+  font-size: 13px;
   color: rgba(255, 255, 255, 0.35);
 }
 
@@ -1110,7 +1110,7 @@ input[type="checkbox"] {
 }
 
 .fring .ficon {
-  font-size: 38px;
+  font-size: 49px;
   color: #fff;
 }
 
@@ -1128,7 +1128,7 @@ input[type="checkbox"] {
 }
 
 #fClock {
-  font-size: 46px;
+  font-size: 60px;
   font-weight: 700;
   line-height: 1.05;
   font-variant-numeric: tabular-nums;
@@ -1142,7 +1142,7 @@ input[type="checkbox"] {
 
 .fsub {
   color: var(--fg-2);
-  font-size: 16px;
+  font-size: 21px;
   margin-bottom: 10px;
 }
 
@@ -1177,7 +1177,7 @@ input[type="checkbox"] {
   align-items: center;
   gap: 4px;
   color: var(--fg-3);
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .fe-row input[type="number"] {
@@ -1192,7 +1192,7 @@ input[type="checkbox"] {
 
 .fedit .pill {
   height: 30px;
-  font-size: 13px;
+  font-size: 17px;
 }
 
 .presets {
@@ -1207,7 +1207,7 @@ input[type="checkbox"] {
   height: 26px;
   border-radius: 13px;
   background: var(--gray);
-  font-size: 12px;
+  font-size: 16px;
   overflow: hidden;
 }
 
@@ -1243,19 +1243,19 @@ input[type="checkbox"] {
 }
 
 .pr-name {
-  font-size: 30px;
+  font-size: 39px;
   font-weight: 700;
   line-height: 1.1;
 }
 
 .pr-time {
-  font-size: 17px;
+  font-size: 22px;
   font-weight: 600;
 }
 
 .pr-count {
   color: var(--fg-2);
-  font-size: 13px;
+  font-size: 17px;
   margin-top: 4px;
 }
 
@@ -1294,16 +1294,16 @@ input[type="checkbox"] {
 }
 
 .pcard .pi {
-  font-size: 18px;
+  font-size: 23px;
 }
 
 .pcard .pn {
   font-weight: 700;
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .pcard .pt {
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -1331,14 +1331,14 @@ input[type="checkbox"] {
 }
 
 .w-num b {
-  font-size: 40px;
+  font-size: 52px;
   font-weight: 700;
   line-height: 1;
 }
 
 .w-num > span {
   color: var(--fg-2);
-  font-size: 17px;
+  font-size: 22px;
   font-weight: 600;
 }
 
@@ -1362,7 +1362,7 @@ input[type="checkbox"] {
   color: #1270ff;
   display: grid;
   place-items: center;
-  font-size: 13px;
+  font-size: 17px;
   transition: left 0.25s var(--ease);
 }
 
@@ -1376,7 +1376,7 @@ input[type="checkbox"] {
 
 .w-sub {
   color: var(--fg-2);
-  font-size: 15px;
+  font-size: 20px;
   margin-top: 4px;
 }
 
@@ -1457,7 +1457,7 @@ input[type="checkbox"] {
   flex-direction: column;
   justify-content: space-between;
   color: var(--fg-2);
-  font-size: 13px;
+  font-size: 17px;
 }
 
 .chart .ticks {
@@ -1465,7 +1465,7 @@ input[type="checkbox"] {
   gap: 7px;
   padding-right: 8px;
   color: var(--fg-2);
-  font-size: 13px;
+  font-size: 17px;
 }
 
 .chart .ticks span {
@@ -1488,7 +1488,7 @@ input[type="checkbox"] {
   justify-content: space-between;
   align-items: center;
   color: var(--fg-2);
-  font-size: 12px;
+  font-size: 16px;
 }
 
 .chips {
@@ -1501,7 +1501,7 @@ input[type="checkbox"] {
   border-radius: 10px;
   background: var(--gray);
   color: var(--fg-2);
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .chips button.on {
@@ -1548,18 +1548,18 @@ input[type="checkbox"] {
 }
 
 .shelf-empty svg {
-  font-size: 46px;
+  font-size: 60px;
   margin-bottom: 6px;
 }
 
 .shelf-empty b {
-  font-size: 18px;
+  font-size: 23px;
   font-weight: 600;
 }
 
 .shelf-empty span {
   color: var(--fg-2);
-  font-size: 13px;
+  font-size: 17px;
 }
 
 .shelf-items {
@@ -1595,7 +1595,7 @@ input[type="checkbox"] {
   border-radius: 12px;
   display: grid;
   place-items: center;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
   color: #111;
   overflow: hidden;
@@ -1606,11 +1606,11 @@ input[type="checkbox"] {
 .ficon.folder {
   background: none;
   color: #5ac8fa;
-  font-size: 50px;
+  font-size: 65px;
 }
 
 .fname {
-  font-size: 12px;
+  font-size: 16px;
   width: 100%;
   text-align: center;
   white-space: nowrap;
@@ -1620,7 +1620,7 @@ input[type="checkbox"] {
 
 .fsize {
   color: var(--fg-2);
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .file.missing {
@@ -1637,7 +1637,7 @@ input[type="checkbox"] {
   background: var(--gray-2);
   display: grid;
   place-items: center;
-  font-size: 10px;
+  font-size: 13px;
   opacity: 0;
 }
 
@@ -1650,7 +1650,7 @@ input[type="checkbox"] {
   right: 10px;
   bottom: 6px;
   color: var(--fg-3);
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .shelf-clear:hover {
@@ -1675,7 +1675,7 @@ input[type="checkbox"] {
 }
 
 .t-score {
-  font-size: 46px;
+  font-size: 60px;
   font-weight: 700;
   line-height: 1.05;
   font-variant-numeric: tabular-nums;
@@ -1683,7 +1683,7 @@ input[type="checkbox"] {
 
 .t-sub {
   color: var(--fg-2);
-  font-size: 16px;
+  font-size: 21px;
   margin-bottom: 12px;
 }
 
@@ -1760,7 +1760,7 @@ input[type="checkbox"] {
 .t-list .tt {
   flex: 1;
   min-width: 0;
-  font-size: 16px;
+  font-size: 21px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -1774,7 +1774,7 @@ input[type="checkbox"] {
 
 .t-list .ttime {
   color: var(--fg-2);
-  font-size: 12px;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1785,7 +1785,7 @@ input[type="checkbox"] {
   border: 2px solid var(--fg-3);
   display: grid;
   place-items: center;
-  font-size: 13px;
+  font-size: 17px;
   flex: none;
   color: #fff;
 }
@@ -1798,7 +1798,7 @@ input[type="checkbox"] {
 .t-list .act {
   display: none;
   color: var(--fg-2);
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .todo.editing .t-list .act {
@@ -1829,7 +1829,7 @@ input[type="checkbox"] {
 
 .n-list .na {
   color: var(--fg-3);
-  font-size: 11px;
+  font-size: 14px;
   display: flex;
   justify-content: space-between;
 }
@@ -1840,7 +1840,7 @@ input[type="checkbox"] {
 
 .n-list .nb {
   color: var(--fg-2);
-  font-size: 12px;
+  font-size: 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1870,7 +1870,7 @@ input[type="checkbox"] {
   flex-direction: column;
   gap: 2px;
   color: var(--fg-2);
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .settings .pair {
@@ -1934,26 +1934,37 @@ input[type="checkbox"] {
     linear-gradient(160deg, #0f1c45 0%, #0a1129 100%);
 }
 
-/* ---------- Tera si maskot ---------- */
+/* ---------- Maskot: Spidey pixel art bergelantungan ---------- */
 
 .mascot {
   position: absolute;
-  top: 2px;
+  top: 0;
   left: 0;
-  width: 52px;
-  height: 58px;
+  width: 70px;
+  height: 104px;
+  padding: 0 6px 6px;
   opacity: 0;
-  transform: translateX(-26px) scale(0.4);
-  transform-origin: left center;
-  transition: opacity 0.35s, transform 0.5s var(--ease);
+  transform: translateY(-110%);
+  transition: opacity 0.3s, transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1);
   pointer-events: none;
   cursor: pointer;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+  border-radius: 0 0 10px 10px;
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04) 45%),
+    rgba(22, 20, 34, 0.35);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border: 2.5px solid var(--ink, #0d0b14);
+  border-top: 0;
+}
+
+body.no-glass .mascot {
+  background: rgba(22, 20, 34, 0.9);
 }
 
 .mascot.show {
   opacity: 1;
-  transform: translateX(6px) scale(1);
+  transform: none;
   pointer-events: auto;
 }
 
@@ -1961,75 +1972,61 @@ input[type="checkbox"] {
   width: 100%;
   height: 100%;
   overflow: visible;
+  image-rendering: pixelated;
 }
 
-.tera .t-body,
-.tera .t-arm,
-.tera .t-flame {
-  transform-box: fill-box;
+.tera .t-swing {
+  transform-box: view-box;
+  transform-origin: 50% 0;
+  animation: swing 3s ease-in-out infinite;
 }
 
-.tera .t-flame {
-  transform-origin: 50% 100%;
-  animation: flicker 1.4s ease-in-out infinite;
-}
-
-@keyframes flicker {
+@keyframes swing {
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
   50% {
-    transform: scaleY(1.18) rotate(4deg);
+    transform: rotate(5deg);
   }
 }
 
-.tera .t-eye {
+.tera .t-eyes {
   transform-box: fill-box;
   transform-origin: center;
-  animation: blink 4.2s infinite;
+  animation: blink 4.2s steps(1) infinite;
 }
 
 @keyframes blink {
   0%,
-  92%,
+  93%,
   100% {
     transform: scaleY(1);
   }
   95% {
-    transform: scaleY(0.1);
+    transform: scaleY(0.2);
   }
 }
 
 .tera .t-eyes-closed,
-.tera .t-mouth-o,
+.tera .t-eyes-big,
 .tera .t-acc {
   display: none;
 }
 
-.tera .t-arm-r {
-  transform-origin: 20% 80%;
-}
-.tera .t-arm-l {
-  transform-origin: 80% 80%;
-}
-
-.mascot.show .tera {
-  animation: hop 0.6s var(--ease);
-}
-
-@keyframes hop {
-  40% {
-    transform: translateY(-6px);
-  }
+.tera .t-arm {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
 }
 
 /* Aksi */
 .m-wave .t-arm-r {
-  animation: wave-arm 0.5s ease-in-out 4 alternate;
+  animation: wave-arm 0.35s steps(2) 8 alternate;
 }
+
 @keyframes wave-arm {
-  from {
-    transform: rotate(0);
-  }
   to {
-    transform: rotate(-55deg) translate(2px, -6px);
+    transform: rotate(-40deg);
   }
 }
 
@@ -2039,128 +2036,104 @@ input[type="checkbox"] {
 .m-cheer .t-eyes {
   display: none;
 }
+
 .m-sleep .t-eyes-closed,
 .m-pray .t-eyes-closed,
 .m-love .t-eyes-closed,
 .m-cheer .t-eyes-closed {
   display: inline;
 }
+
 .m-sleep .t-zzz {
   display: inline;
-  animation: float 2s ease-in-out infinite;
+  animation: float 2s steps(4) infinite;
 }
-.m-sleep .tera {
-  animation: breathe 3s ease-in-out infinite !important;
-}
-@keyframes breathe {
-  50% {
-    transform: scale(1.04, 0.97);
-  }
+
+.m-sleep .t-swing {
+  animation-duration: 6s;
 }
 
 .m-drink .t-cup {
   display: inline;
-  animation: sip 1.6s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-@keyframes sip {
-  50% {
-    transform: rotate(-25deg) translate(-6px, -4px);
-  }
+  animation: float 1.2s steps(2) infinite;
 }
 
-.m-dance .tera {
-  animation: dance 0.5s ease-in-out infinite alternate !important;
+.m-dance .t-swing {
+  animation: swing 0.6s steps(3) infinite;
 }
+
 .m-dance .t-notes {
   display: inline;
-  animation: float 1.2s ease-in-out infinite;
-}
-@keyframes dance {
-  from {
-    transform: rotate(-8deg) translateY(0);
-  }
-  to {
-    transform: rotate(8deg) translateY(-4px);
-  }
+  animation: float 1s steps(2) infinite;
 }
 
 .m-read .t-book {
   display: inline;
 }
-.m-read .t-arm {
-  display: none;
+
+.m-shock .t-eyes {
+  animation: none;
+  transform: scale(1.18);
 }
 
-.m-shock .t-mouth-smile {
-  display: none;
-}
-.m-shock .t-mouth-o,
 .m-shock .t-sweat {
   display: inline;
 }
-.m-shock .tera {
-  animation: shake 0.12s linear 6 !important;
+
+.m-shock .t-swing {
+  animation: shake 0.1s steps(2) 10;
 }
+
 @keyframes shake {
-  25% {
-    transform: translateX(-2px);
-  }
-  75% {
-    transform: translateX(2px);
+  50% {
+    transform: translateX(1.5px);
   }
 }
 
 .m-love .t-hearts,
 .m-cheer .t-spark {
   display: inline;
-  animation: float 1.6s ease-in-out infinite;
+  animation: float 1.4s steps(3) infinite;
 }
+
 .m-cheer .t-arm {
-  animation: cheer 0.4s ease-in-out infinite alternate;
+  animation: cheer 0.3s steps(2) infinite alternate;
 }
+
 @keyframes cheer {
   to {
-    transform: translateY(-8px);
+    transform: translateY(-3px);
   }
 }
 
 .m-pray .t-arm-l {
-  transform: translate(14px, 0);
-}
-.m-pray .t-arm-r {
-  transform: translate(-14px, 0);
+  transform: translateX(2px);
 }
 
-.m-think .t-eyes {
-  transform: translate(2px, -2px);
+.m-pray .t-arm-r {
+  transform: translateX(-2px);
 }
-.m-think .tera {
-  animation: tilt 2.4s ease-in-out infinite !important;
-}
-@keyframes tilt {
-  50% {
-    transform: rotate(-6deg);
-  }
+
+.m-think .t-swing {
+  animation: swing 5s ease-in-out infinite;
 }
 
 @keyframes float {
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-2px);
   }
 }
 
 .bubble {
   position: absolute;
-  top: 62px;
+  top: 26px;
   left: 0;
-  max-width: 230px;
+  max-width: 260px;
   padding: 8px 12px;
-  border-radius: 14px 14px 14px 4px;
-  background: #fff7ea;
-  color: #2b1a10;
-  font-size: 12px;
+  border-radius: 12px;
+  background: #fffdf4;
+  color: #1a1420;
+  font-size: 17px;
   font-weight: 500;
   line-height: 1.35;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
@@ -2179,4 +2152,348 @@ input[type="checkbox"] {
 /* Saat dibuka di browser biasa untuk pratinjau */
 body.preview {
   background: linear-gradient(180deg, #e9efff 0%, #9aa8ff 45%, #5b48e8 75%, #0b0820 100%);
+}
+
+/* =====================================================================
+   Tema v1.2: kaca buram (frosted) + gaya komik pixel dengan garis tinta
+   ===================================================================== */
+
+@font-face {
+  font-family: "Pixelify Sans";
+  src: url("fonts/pixelify-sans-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Pixelify Sans";
+  src: url("fonts/pixelify-sans-latin-600-normal.woff2") format("woff2");
+  font-weight: 500 600;
+}
+@font-face {
+  font-family: "Pixelify Sans";
+  src: url("fonts/pixelify-sans-latin-700-normal.woff2") format("woff2");
+  font-weight: 700 900;
+}
+
+:root {
+  --ink: #0d0b14;
+  --glass: rgba(22, 20, 34, 0.42);
+  --glass-hi: rgba(255, 255, 255, 0.16);
+  --gray: rgba(255, 255, 255, 0.13);
+  --gray-2: rgba(255, 255, 255, 0.22);
+  --fg-2: #d3d0e0;
+  --fg-3: #a8a4ba;
+  --line: rgba(255, 255, 255, 0.18);
+  --green-bg: rgba(50, 215, 75, 0.28);
+}
+
+html,
+body,
+button,
+input,
+select {
+  font-family: "Pixelify Sans", "Segoe UI", system-ui, sans-serif;
+}
+
+/* Telinga notch tidak dipakai di gaya kaca */
+#notch::before,
+#notch::after {
+  display: none;
+}
+
+#notch .body {
+  background:
+    linear-gradient(165deg, var(--glass-hi) 0%, rgba(255, 255, 255, 0.04) 38%, rgba(0, 0, 0, 0.16) 100%),
+    var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  box-shadow:
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.35),
+    inset 1.5px 0 0 rgba(255, 255, 255, 0.18),
+    inset -1.5px 0 0 rgba(255, 255, 255, 0.18);
+}
+
+/* Tanpa blur sungguhan (dimatikan di Settings): kaca dibuat lebih pekat */
+body.no-glass #notch .body {
+  --glass: rgba(22, 20, 34, 0.9);
+}
+
+/* Titik raster ala komik di pojok kanan bawah */
+#notch .body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.11) 1.2px, transparent 1.6px) 0 0 / 7px 7px;
+  -webkit-mask-image: radial-gradient(circle at 100% 100%, #000 0%, transparent 55%);
+  mask-image: radial-gradient(circle at 100% 100%, #000 0%, transparent 55%);
+}
+
+/* Garis tinta tebal yang sedikit bergelombang, seperti digambar tangan */
+#notch .body::after {
+  content: "";
+  position: absolute;
+  inset: -3px 1px 1px;
+  pointer-events: none;
+  border: 3px solid var(--ink);
+  border-top: 0;
+  border-radius: inherit;
+  filter: url(#rough);
+  opacity: 0.9;
+}
+
+/* Saat tidak dipakai: tetap garis hitam tipis yang polos */
+#notch.collapsed.minimal:not(.wide) .body {
+  background: #000;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+#notch.collapsed.minimal:not(.wide) .body::before,
+#notch.collapsed.minimal:not(.wide) .body::after {
+  display: none;
+}
+
+#notch.expanded.lyrics-mode .body {
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.14), transparent 40%),
+    linear-gradient(180deg, rgba(10, 16, 48, 0.55) 0%, rgba(26, 58, 140, 0.6) 100%);
+}
+
+#notch.peeking[data-theme] .body {
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.14), transparent 40%),
+    var(--g);
+  opacity: 1;
+}
+
+#notch.idle .body {
+  background:
+    radial-gradient(120% 70% at 20% 120%, rgba(0, 200, 255, 0.8), transparent 60%),
+    radial-gradient(120% 70% at 80% 120%, rgba(140, 70, 255, 0.8), transparent 60%),
+    var(--glass);
+}
+
+#notch.expanded,
+#notch.peeking {
+  filter: none;
+}
+
+/* Teks: putih dengan bayangan tinta keras supaya tetap terbaca di atas kaca */
+#notch {
+  text-shadow: 0 2px 0 rgba(13, 11, 20, 0.75);
+  letter-spacing: 0.2px;
+}
+
+.ptitle,
+.peek-title,
+.ptrack,
+#fClock,
+.t-score,
+.pr-name,
+.w-num b,
+.peek-side {
+  font-weight: 700;
+  text-shadow:
+    2px 2px 0 var(--ink),
+    -1px -1px 0 var(--ink),
+    1px -1px 0 var(--ink),
+    -1px 1px 0 var(--ink);
+}
+
+/* Tombol pil: kotak tebal bergaris tinta dengan bayangan keras (pixel/komik) */
+.pill,
+.round,
+.nav,
+.chips button,
+.preset,
+.pbtns .pp,
+.gear {
+  border: 2.5px solid var(--ink);
+  box-shadow: 0 3px 0 var(--ink);
+  border-radius: 8px;
+  text-shadow: none;
+}
+
+.pill {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.pill:active,
+.round:active,
+.nav:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.pill.go {
+  background: #ff4b55;
+}
+
+.pill.blue {
+  background: #2f8cff;
+}
+
+.pill.light {
+  background: #fff;
+  color: var(--ink);
+}
+
+.nav {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+}
+
+.gear {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.gear:hover,
+.gear.on {
+  border-color: var(--ink);
+  box-shadow: 0 3px 0 var(--ink);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Titik halaman kotak seperti pixel */
+.dots button {
+  border-radius: 1px;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--ink);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.dots button.on {
+  width: 26px;
+  background: #fff;
+}
+
+/* Kartu dan baris bergaris tinta */
+.art,
+.pcard,
+.t-list li[data-id],
+.file:hover,
+.shelf,
+.chart .bars span,
+.switch,
+input[type="text"],
+input[type="number"],
+input[type="time"],
+select {
+  border: 2px solid var(--ink);
+}
+
+.art,
+.pcard,
+.t-list li[data-id] {
+  box-shadow: 0 3px 0 var(--ink);
+}
+
+.t-list li[data-id] {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.shelf {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.seek,
+.w-bar,
+.peek-bar {
+  border: 1.5px solid var(--ink);
+  height: 9px;
+  border-radius: 2px;
+}
+
+.seek-fill,
+.w-bar i,
+.peek-bar i {
+  border-radius: 0;
+}
+
+/* Cincin progres dibuat bertangga (pixel) dengan garis tinta */
+.ring-mini,
+.peek-ring::before,
+.fring {
+  filter: drop-shadow(1.5px 1.5px 0 var(--ink));
+}
+
+/* Gelembung bicara maskot gaya komik */
+.bubble {
+  font-family: "Pixelify Sans", "Segoe UI", sans-serif;
+  border: 2.5px solid var(--ink);
+  box-shadow: 0 4px 0 var(--ink);
+  border-radius: 12px;
+}
+
+/* Angka memakai huruf yang lebih jelas (angka 5 di font pixel mirip S) */
+@font-face {
+  font-family: "Lentera Digits";
+  src: local("Segoe UI Variable Display Semibold"), local("Segoe UI Semibold"), local("Segoe UI Bold"), local("Arial Bold"),
+    local("Liberation Sans Bold"), local("DejaVu Sans Bold");
+  unicode-range: U+0030-0039, U+0025;
+}
+
+html,
+body,
+button,
+input,
+select {
+  font-family: "Lentera Digits", "Pixelify Sans", "Segoe UI", system-ui, sans-serif;
+}
+
+:root {
+  --glass: rgba(18, 16, 30, 0.55);
+}
+
+/* Kepala panel: judul kiri, baterai + tanggal + jam di kanan (tidak bertabrakan) */
+.phead {
+  justify-content: flex-start;
+  gap: 14px;
+}
+
+.pdate,
+#notch[data-page="music"] .pdate {
+  position: static;
+  transform: none;
+  margin-left: auto;
+  gap: 8px;
+}
+
+.phead .wave {
+  margin-left: 4px;
+}
+
+.pcard .pn {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.lyrics .l {
+  text-shadow: none;
+}
+
+.lyrics .l.cur {
+  text-shadow:
+    2px 2px 0 var(--ink),
+    -1px -1px 0 var(--ink);
+}
+
+/* Maskot lebih besar supaya pikselnya terlihat */
+.mascot {
+  width: 96px;
+  height: 140px;
+}
+
+.bubble {
+  top: 34px;
+}
+
+.w-right {
+  margin-right: 22px;
 }
