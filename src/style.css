@@ -2806,3 +2806,64 @@ body.no-glass .mascot {
   font-size: 19px;
   white-space: nowrap;
 }
+
+/* =====================================================================
+   v1.4.2: mode lirik = lirik saja, selebar panel, baris tidak terpotong.
+   ===================================================================== */
+
+.lyr-back {
+  display: none;
+}
+
+#notch.lyrics-mode .player {
+  display: none;
+}
+
+#notch.lyrics-mode .panel {
+  padding: 14px 64px 14px 64px;
+}
+
+#notch.lyrics-mode .lyrics {
+  border-left: 0;
+  padding: 0;
+  text-align: center;
+  -webkit-mask-image: linear-gradient(transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(transparent, #000 16%, #000 84%, transparent);
+}
+
+#notch.lyrics-mode .lyrics .l {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+  padding: 5px 0;
+  font-size: 24px;
+}
+
+#notch.lyrics-mode .lyrics .l.cur {
+  font-size: 28px;
+}
+
+#notch.lyrics-mode .lyrics .msg {
+  padding-top: 72px;
+}
+
+#notch.lyrics-mode .lyr-back {
+  display: grid;
+  place-items: center;
+  position: absolute;
+  left: 18px;
+  top: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  z-index: 2;
+}
+
+#notch.lyrics-mode .lyr-back svg {
+  width: 1em;
+  height: 1em;
+}

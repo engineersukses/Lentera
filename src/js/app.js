@@ -470,6 +470,9 @@ $("lyrics").addEventListener("click", (e) => {
   if (l) seekTo(lyrics.lines[+l.dataset.i].t);
 });
 
+// Tombol lirik membuka tampilan lirik penuh; tombol kecil di pojok menutupnya lagi.
+$("lyricsBack").addEventListener("click", () => $("lyricsBtn").click());
+
 $("lyricsBtn").addEventListener("click", () => {
   settings.lyricsOpen = !settings.lyricsOpen;
   saveSettings();
