@@ -74,6 +74,25 @@ async fn fetch_lyrics(
     blocking(move || lyrics::fetch(&title, &artist, &album, duration)).await
 }
 
+/// Ambil JSON dari layanan jadwal sholat. Hanya host tertentu yang diizinkan.
+#[tauri::command]
+async fn http_json(url: String) -> Result<serde_json::Value, String> {
+    const ALLOWED: [&str; 2] = ["https://api.myquran.com/", "https://api.aladhan.com/"];
+    if !ALLOWED.iter().any(|h| url.starts_with(h)) {
+        return Err("host not allowed".into());
+    }
+    tauri::async_runtime::spawn_blocking(move || {
+        lyrics::agent()
+            .get(&url)
+            .call()
+            .map_err(|e| e.to_string())?
+            .into_json::<serde_json::Value>()
+            .map_err(|e| e.to_string())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
 #[tauri::command]
 fn open_file(path: String) {
     let _ = tauri_plugin_opener::open_path(path, None::<&str>);
@@ -144,17 +163,17 @@ fn start_click_through(app: AppHandle) {
 
 fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     let autostart_on = app.autolaunch().is_enabled().unwrap_or(false);
-    let show = MenuItem::with_id(app, "toggle", "Tampilkan / Sembunyikan", true, None::<&str>)?;
-    let settings = MenuItem::with_id(app, "settings", "Pengaturan", true, None::<&str>)?;
+    let show = MenuItem::with_id(app, "toggle", "Show / Hide", true, None::<&str>)?;
+    let settings = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
     let autostart = CheckMenuItem::with_id(
         app,
         "autostart",
-        "Jalankan saat Windows menyala",
+        "Start with Windows",
         true,
         autostart_on,
         None::<&str>,
     )?;
-    let quit = MenuItem::with_id(app, "quit", "Keluar", true, None::<&str>)?;
+    let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
     let sep = PredefinedMenuItem::separator(app)?;
     let menu = Menu::with_items(app, &[&show, &settings, &autostart, &sep, &quit])?;
 
@@ -212,6 +231,7 @@ pub fn run() {
             system_status,
             notifications_poll,
             fetch_lyrics,
+            http_json,
             file_info,
             media_seek,
             idle_ms,

@@ -30,7 +30,7 @@ impl From<Record> for Lyrics {
     }
 }
 
-fn agent() -> ureq::Agent {
+pub fn agent() -> ureq::Agent {
     let mut b = ureq::AgentBuilder::new().timeout(Duration::from_secs(8)).user_agent(UA);
     // Pakai TLS bawaan Windows (SChannel), jadi tidak perlu library kripto tambahan.
     if let Ok(tls) = native_tls::TlsConnector::new() {

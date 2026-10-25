@@ -37,12 +37,12 @@ function sunPosition(jd) {
 }
 
 export const PRAYERS = [
-  { key: "subuh", name: "Subuh", fard: true },
-  { key: "terbit", name: "Terbit", fard: false },
-  { key: "dzuhur", name: "Dzuhur", fard: true },
-  { key: "ashar", name: "Ashar", fard: true },
+  { key: "subuh", name: "Fajr", fard: true },
+  { key: "terbit", name: "Sunrise", fard: false },
+  { key: "dzuhur", name: "Dhuhr", fard: true },
+  { key: "ashar", name: "Asr", fard: true },
   { key: "maghrib", name: "Maghrib", fard: true },
-  { key: "isya", name: "Isya", fard: true },
+  { key: "isya", name: "Isha", fard: true },
 ];
 
 /** Jadwal untuk tanggal kalender lokal `date`. Hasilnya objek Date per waktu. */
@@ -165,5 +165,5 @@ export const CITIES = [
   ["Ternate", 0.7893, 127.3753],
   ["Jayapura", -2.5337, 140.7181],
   ["Kuala Lumpur", 3.139, 101.6869],
-  ["Singapura", 1.3521, 103.8198],
+  ["Singapore", 1.3521, 103.8198],
 ];

@@ -8,7 +8,10 @@ Arahkan kursor ke notch untuk membuka panel lengkap.
 Tampilannya mengikuti Nusa: notch hitam dengan cincin baterai, jam, dan
 gelombang suara; panel terbuka dengan panah kiri/kanan dan titik halaman
 (bisa juga digulir dengan roda mouse); kartu sekilas dengan cincin progres.
-Fitur tambahan ditandai ✨.
+Fitur tambahan ditandai ✨. Semua teks di aplikasi berbahasa Inggris.
+
+Saat tidak dipakai, notch mengecil jadi garis hitam tipis. Ukuran notch bisa diatur (bawaan 50%)
+di Settings, yang dibuka lewat ikon gerigi di kiri atas panel.
 
 | Fitur | Keterangan |
 | --- | --- |
@@ -16,7 +19,7 @@ Fitur tambahan ditandai ✨.
 | 🎵 Musik | Lagu dari pemutar apa saja (Spotify, YouTube di browser, dll.), waktu berjalan dan sisa waktu, bar yang bisa diklik untuk menggeser lagu, tombol putar/jeda/maju/mundur. |
 | ❝ Lirik | Tombol lirik membelah notch jadi dua panel. Baris yang sedang dinyanyikan menyala; klik baris untuk loncat ke bagian itu. Lirik dari [LRCLIB](https://lrclib.net). |
 | ⏱️ Fokus ✨ | Timer dengan durasi bebas (jam/menit/detik), bisa diberi nama, disimpan sebagai preset, dan diulang otomatis. Plus **stopwatch** yang terus berjalan walau notch ditutup atau aplikasi dibuka ulang. |
-| 🕌 Sholat 5 waktu ✨ | Jadwal dihitung offline (metode Kemenag). Tiap waktu punya warna sendiri: Subuh ungu fajar, Dzuhur kuning, Ashar jingga, Maghrib merah senja, Isya biru malam berbintang. Pengingat sebelum dan saat masuk waktu. |
+| 🕌 Sholat 5 waktu ✨ | Jadwal online dari data resmi Kemenag RI (lewat api.myquran.com), diperbarui otomatis tiap 6 jam; bisa cari kabupaten/kota mana pun di Indonesia. Kuala Lumpur/Singapura/koordinat sendiri memakai api.aladhan.com. Tanpa internet, dihitung offline (metode Kemenag). Tiap waktu punya warna sendiri: Subuh ungu fajar, Dzuhur kuning, Ashar jingga, Maghrib merah senja, Isya biru malam berbintang. Pengingat sebelum dan saat masuk waktu. |
 | 💧 Air | Target 1,5–3 L, saklar pengingat, ukuran botol/gelas, jam pengingat, dan grafik minum 9 jam terakhir. |
 | 🗂️ Rak | Seret file/folder ke notch, lalu seret keluar lagi. Menampilkan ukuran file. Klik untuk membuka, klik kanan untuk membuka foldernya. |
 | ✅ To-do | Hitungan "selesai hari ini", tambah/ubah tugas, tugas bisa diberi jam dan notch akan mengingatkan. |

@@ -12,9 +12,9 @@ const demo = {
     const pos = (Date.now() - demoStart) % duration;
     return {
       available: true,
-      title: "Lagu Contoh",
-      artist: "Penyanyi Contoh",
-      album: "Album Contoh",
+      title: "Sample Song",
+      artist: "Sample Artist",
+      album: "Sample Album",
       app: "Spotify.exe",
       playing: this.playing,
       position_ms: pos,
@@ -31,19 +31,30 @@ const mock = {
     if (action === "toggle") demo.playing = !demo.playing;
   },
   system_status: () => ({
-    battery: { present: true, percent: 76, charging: false, plugged: false },
-    network: { connected: true, internet: true, wifi: true, name: "WiFi Rumah" },
+    battery: { present: true, percent: 76, charging: false, plugged: false, ...(window.__mockBattery || {}) },
+    network: { connected: true, internet: true, wifi: true, name: "Home WiFi" },
     bluetooth: ["Galaxy Buds2"],
   }),
   notifications_poll: () => ({ access: "allowed", items: [] }),
   fetch_lyrics: () => ({
-    synced: "[00:00.00]Ini baris lirik pertama\n[00:05.00]Notch membelah jadi dua panel\n[00:10.00]Baris yang dinyanyikan menyala\n[00:15.00]Klik satu baris untuk loncat\n[00:20.00]Lirik asli diambil dari LRCLIB\n[00:25.00]Ini hanya contoh untuk pratinjau\n[00:30.00]Lagu terus berjalan\n[00:35.00]Sampai baris terakhir",
+    synced: "[00:00.00]This is the first lyric line\n[00:05.00]The notch splits into two panels\n[00:10.00]The line being sung lights up\n[00:15.00]Click a line to jump there\n[00:20.00]Real lyrics come from LRCLIB\n[00:25.00]This is only a preview sample\n[00:30.00]The song keeps playing\n[00:35.00]Until the very last line",
     plain: null,
     instrumental: false,
   }),
   file_info: ({ path }) => ({ exists: true, is_dir: !path.includes("."), size: 2516582 }),
   media_seek: ({ positionMs }) => {
     demoStart = Date.now() - positionMs;
+  },
+  http_json: ({ url }) => {
+    if (url.includes("/kota/cari/")) return { data: [{ id: "1301", lokasi: "KOTA JAKARTA" }, { id: "1501", lokasi: "KAB. SLEMAN" }] };
+    const m = url.match(/jadwal\/\d+\/(\d+)\/(\d+)/);
+    if (!m) return null;
+    const days = new Date(+m[1], +m[2], 0).getDate();
+    const jadwal = Array.from({ length: days }, (_, i) => ({
+      date: `${m[1]}-${m[2]}-${String(i + 1).padStart(2, "0")}`,
+      imsak: "04:01", subuh: "04:11", terbit: "05:25", dzuhur: "11:40", ashar: "14:52", maghrib: "17:49", isya: "18:59",
+    }));
+    return { data: { jadwal } };
   },
   idle_ms: () => 0,
   set_interactive: () => {},

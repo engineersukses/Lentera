@@ -1,6 +1,6 @@
 [package]
 name = "lentera"
-version = "1.0.0"
+version = "1.1.0"
 description = "Lentera - notch kecil yang hidup di atas layar Windows"
 authors = ["Claudia"]
 edition = "2021"

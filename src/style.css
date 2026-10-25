@@ -145,8 +145,8 @@ svg {
 }
 
 #notch.collapsed.minimal:not(.wide) {
-  --w: 180px;
-  --h: 6px;
+  --w: 200px;
+  --h: 8px;
 }
 
 #notch.collapsed.minimal:not(.wide) .body {
@@ -557,6 +557,83 @@ svg {
   justify-content: space-between;
   height: 30px;
   margin: 0 -32px 4px -32px;
+}
+
+.pleft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Ikon gerigi pengaturan di kiri atas; berputar sedikit tiap diklik */
+.gear {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 19px;
+  color: var(--fg-2);
+  transition: color 0.2s, background 0.2s;
+}
+
+.gear svg {
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gear:hover,
+.gear.on {
+  color: #fff;
+  background: var(--gray);
+}
+
+#notch[data-page="settings"] .nav,
+#notch[data-page="settings"] .dots {
+  visibility: hidden;
+}
+
+/* Baterai: cincin + persen + petir saat mengisi */
+.batt {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.batt .bolt {
+  display: none;
+  color: var(--green);
+  font-size: 14px;
+}
+
+.batt.charging .bolt {
+  display: block;
+}
+
+#headPct {
+  font-variant-numeric: tabular-nums;
+}
+
+.batt.charging #headPct {
+  color: var(--green);
+}
+
+.mini .batt .bolt {
+  font-size: 13px;
+  margin-left: -2px;
+}
+
+.pill.small {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12px;
+  flex: none;
+}
+
+.set-status {
+  color: var(--fg-3);
+  font-size: 11px;
+  align-self: end;
 }
 
 .ptitle {

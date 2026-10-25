@@ -45,10 +45,10 @@ const SVG = `
 export const ACTIONS = ["wave", "sleep", "drink", "dance", "read", "shock", "love", "pray", "think", "cheer"];
 
 function greetingByHour(h) {
-  if (h >= 3 && h < 10) return "Selamat pagi";
-  if (h >= 10 && h < 15) return "Selamat siang";
-  if (h >= 15 && h < 18) return "Selamat sore";
-  return "Selamat malam";
+  if (h >= 3 && h < 10) return "Good morning";
+  if (h >= 10 && h < 15) return "Good afternoon";
+  if (h >= 15 && h < 18) return "Good evening";
+  return "Good night";
 }
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -60,32 +60,32 @@ export function chooseLine(ctx) {
   const options = [];
 
   options.push(["wave", `${greetingByHour(h)}${name}! 👋`]);
-  options.push(["wave", pick([`Hai${name}! Aku nemenin di sini ya.`, `Halo${name}~ lagi ngapain?`, "Cek cek, Tera hadir! ✨"])]);
-  options.push(["think", pick(["Hmm... lagi mikirin camilan.", "Kalau capek, istirahat sebentar ya.", "Satu langkah kecil juga tetap maju."])]);
-  options.push(["cheer", pick(["Semangat! Kamu pasti bisa 💪", "Kamu hebat hari ini!", "Pelan-pelan aja, yang penting jalan."])]);
-  options.push(["read", pick(["Baca dulu ah... 📖", "Lagi belajar hal baru nih."])]);
-  options.push(["love", pick(["Jangan lupa senyum hari ini 💛", "Terima kasih sudah bertahan sejauh ini."])]);
+  options.push(["wave", pick([`Hi${name}! I'll keep you company here.`, `Hello${name}~ what are you up to?`, "Check check, Tera is here! ✨"])]);
+  options.push(["think", pick(["Hmm... thinking about snacks.", "If you're tired, take a short break.", "One small step is still progress."])]);
+  options.push(["cheer", pick(["You got this! 💪", "You're doing great today!", "Slow and steady, just keep going."])]);
+  options.push(["read", pick(["Reading for a bit... 📖", "Learning something new today."])]);
+  options.push(["love", pick(["Don't forget to smile today 💛", "Thank you for making it this far."])]);
 
   if (h >= 22 || h < 4) {
-    options.push(["sleep", "Udah malam... jangan begadang terus ya 😴"], ["sleep", "Hoaam... Tera ngantuk."]);
+    options.push(["sleep", "It's late... don't stay up too long 😴"], ["sleep", "Yawn... Tera is sleepy."]);
   }
   if (ctx.music?.playing && ctx.music.title) {
-    options.push(["dance", `Lagunya enak! 🎶 ${ctx.music.title}`], ["dance", "Joget dulu~ ♪"]);
+    options.push(["dance", `Great song! 🎶 ${ctx.music.title}`], ["dance", "Dance time~ ♪"]);
   }
   if (ctx.waterPct != null && ctx.waterPct < 100) {
-    options.push(["drink", ctx.waterPct < 50 ? "Minumnya masih sedikit, yuk minum air 💧" : "Sedikit lagi target minummu tercapai!"]);
+    options.push(["drink", ctx.waterPct < 50 ? "You haven't drunk much yet, have some water 💧" : "Almost at your water goal!"]);
   }
   if (ctx.todoLeft > 0) {
-    options.push(["think", `Masih ada ${ctx.todoLeft} tugas di to-do. Satu-satu ya!`]);
+    options.push(["think", `${ctx.todoLeft} tasks left on your to-do. One at a time!`]);
   }
   if (ctx.nextPrayer && ctx.nextPrayer.minutes <= 30) {
-    options.push(["pray", `${ctx.nextPrayer.minutes} menit lagi ${ctx.nextPrayer.name}. Siap-siap wudhu yuk 🤲`]);
+    options.push(["pray", `${ctx.nextPrayer.name} in ${ctx.nextPrayer.minutes} min. Time to get ready 🤲`]);
   }
   if (ctx.battery && ctx.battery.present && !ctx.battery.plugged && ctx.battery.percent <= 25) {
-    options.push(["shock", `Baterai tinggal ${ctx.battery.percent}%! Cari charger 🔌`]);
+    options.push(["shock", `Only ${ctx.battery.percent}% battery! Find a charger 🔌`]);
   }
   if (ctx.timerRunning) {
-    options.push(["cheer", "Fokus! Tera jagain timernya ⏱"]);
+    options.push(["cheer", "Focus! Tera is watching the timer ⏱"]);
   }
   return pick(options);
 }

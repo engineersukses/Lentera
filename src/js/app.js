@@ -29,8 +29,12 @@ const DEFAULTS = {
   prayerSound: true,
   mascotEvery: 4,
   eyes: true,
-  minimal: false,
+  minimal: true,
   miniLyrics: true,
+  scale: 0.5,
+  prayerSrc: "online",
+  myqId: null,
+  myqName: "",
   notifPeek: true,
   overlays: true,
   lyricsOpen: false,
@@ -38,12 +42,44 @@ const DEFAULTS = {
 const settings = { ...DEFAULTS, ...load("settings", {}) };
 const saveSettings = () => save("settings", settings);
 
+// Versi 2: tampilan berbahasa Inggris, notch setengah ukuran, garis tipis saat tidak dipakai.
+if (!settings.v2) {
+  Object.assign(settings, { v2: true, minimal: true, scale: 0.5 });
+  if (settings.city === "Singapura") settings.city = "Singapore";
+  saveSettings();
+}
+
+// Ukuran notch: seluruh tampilan diperkecil dengan CSS zoom.
+const zoom = () => +settings.scale || 1;
+const applyScale = () => (document.documentElement.style.zoom = zoom());
+applyScale();
+
 /* ================= Halaman (panah kiri/kanan + titik) ================= */
 
-const PAGES = ["music", "timer", "prayer", "water", "shelf", "todo", "notif", "settings"];
+const PAGES = ["music", "timer", "prayer", "water", "shelf", "todo", "notif"];
 let page = PAGES.includes(load("page", "music")) ? load("page", "music") : "music";
+let settingsOpen = false;
+let gearTurns = 0;
+
+// Pengaturan bukan halaman geser: dibuka lewat ikon gerigi di kiri atas.
+function showSettings(on) {
+  settingsOpen = on;
+  gearTurns++;
+  $("gearBtn").querySelector("svg").style.transform = `rotate(${gearTurns * 90}deg)`;
+  $("gearBtn").classList.toggle("on", on);
+  notch.dataset.page = on ? "settings" : page;
+  applyLyricsMode();
+  renderAll();
+}
+
+$("gearBtn").addEventListener("click", () => showSettings(!settingsOpen));
 
 function setPage(p) {
+  if (p === "settings") return showSettings(true);
+  if (settingsOpen) {
+    settingsOpen = false;
+    $("gearBtn").classList.remove("on");
+  }
   page = p;
   notch.dataset.page = p;
   save("page", p);
@@ -91,7 +127,7 @@ let hoverNative = false;
 let pinUntil = 0;
 let collapseTimer = null;
 
-const lyricsMode = () => expanded && page === "music" && settings.lyricsOpen;
+const lyricsMode = () => expanded && !settingsOpen && page === "music" && settings.lyricsOpen;
 const expandedSize = () => ({ w: lyricsMode() ? 820 : 660, h: 228 });
 
 function applyLyricsMode() {
@@ -117,6 +153,11 @@ function collapse() {
   notch.classList.remove("expanded", "dragging", "lyrics-mode");
   notch.classList.add("collapsed");
   $("fEdit").hidden = true;
+  if (settingsOpen) {
+    settingsOpen = false;
+    $("gearBtn").classList.remove("on");
+    notch.dataset.page = page;
+  }
   renderMini();
   setTimeout(nextPeek, 450);
 }
@@ -175,13 +216,15 @@ window.lentera = {
 let lastRects = "";
 function syncInteractive() {
   const rects = [];
+  // getBoundingClientRect sudah memperhitungkan zoom (piksel layar CSS).
+  const z = zoom();
   const r = notch.getBoundingClientRect();
   // Saat sedang membesar, pakai ukuran tujuan supaya kursor tidak "jatuh" keluar.
   const size = expandedSize();
-  const w = expanded ? Math.max(r.width, size.w) : r.width;
-  // Notch minimal hanya garis tipis: beri area hover yang sedikit lebih tinggi.
-  const h = expanded ? Math.max(r.height, size.h) : Math.max(r.height, 10);
-  rects.push({ x: r.left + r.width / 2 - w / 2 - 14, y: 0, w: w + 28, h: h + 6 });
+  // Garis tipis tetap punya area hover yang cukup besar untuk disentuh kursor.
+  const w = expanded ? Math.max(r.width, size.w * z) : Math.max(r.width, 140);
+  const h = expanded ? Math.max(r.height, size.h * z) : Math.max(r.height, 12);
+  rects.push({ x: r.left + r.width / 2 - w / 2 - 14 * z, y: 0, w: w + 28 * z, h: h + 6 });
   if (mascot.isVisible()) {
     const m = $("mascot").getBoundingClientRect();
     rects.push({ x: m.left, y: m.top, w: m.width, h: m.height });
@@ -192,10 +235,11 @@ function syncInteractive() {
     invoke("set_interactive", { rects: JSON.parse(json) });
   }
   // Tera selalu menempel di sisi kanan notch (di luar lengkungan telinga).
-  const left = r.right + 14;
+  // Posisi style dihitung dalam satuan sebelum zoom.
+  const left = r.right / z + 14;
   const bubble = $("bubble");
   $("mascot").style.left = `${left}px`;
-  bubble.style.left = `${Math.min(left + 8, window.innerWidth - bubble.offsetWidth - 6)}px`;
+  bubble.style.left = `${Math.min(left + 8, window.innerWidth / z - bubble.offsetWidth - 6)}px`;
 }
 setInterval(syncInteractive, 60);
 
@@ -295,9 +339,9 @@ function mascotSay(action, text, ms) {
 
 $("mascot").addEventListener("click", () => {
   const reactions = [
-    ["love", "Hehe, geli! 😆"],
-    ["cheer", "Yay! Ada yang nyolek Tera ✨"],
-    ["wave", `Iya${settings.name ? ", " + settings.name : ""}? Tera di sini!`],
+    ["love", "Hehe, that tickles! 😆"],
+    ["cheer", "Yay! Someone poked Tera ✨"],
+    ["wave", `Yes${settings.name ? ", " + settings.name : ""}? Tera is here!`],
   ];
   const [a, t] = Math.random() < 0.5 ? reactions[Math.floor(Math.random() * reactions.length)] : chooseLine(mascotContext());
   mascot.show(a, t, 5000);
@@ -347,7 +391,7 @@ async function pollMedia() {
     const key = media.available ? `${media.title}|${media.artist}` : "";
     if (key && key !== prevKey) {
       lyrics = { key, lines: [], plain: null, instrumental: false, loading: true };
-      if (media.playing && Math.random() < 0.35) mascotSay("dance", `Wah, ${media.title}! 🎶`, 4500);
+      if (media.playing && Math.random() < 0.35) mascotSay("dance", `Ooh, ${media.title}! 🎶`, 4500);
       const res = await invoke("fetch_lyrics", {
         title: media.title,
         artist: media.artist,
@@ -393,8 +437,8 @@ function renderLyrics() {
   if (lyricsBuiltFor !== state) {
     lyricsBuiltFor = state;
     let html;
-    if (!media.available) html = `<div class="msg">Tidak ada lagu yang diputar</div>`;
-    else if (lyrics.loading) html = `<div class="msg">Memuat lirik…</div>`;
+    if (!media.available) html = `<div class="msg">Nothing is playing</div>`;
+    else if (lyrics.loading) html = `<div class="msg">Loading lyrics…</div>`;
     else if (lyrics.instrumental) html = `<div class="msg">🎼 Instrumental</div>`;
     else if (lyrics.lines.length)
       html = `<div class="lyrics-inner">${lyrics.lines
@@ -406,7 +450,7 @@ function renderLyrics() {
         .filter(Boolean)
         .map((l) => `<div class="l">${esc(l)}</div>`)
         .join("")}</div>`;
-    else html = `<div class="msg">Lirik belum tersedia untuk lagu ini</div>`;
+    else html = `<div class="msg">No lyrics available for this song</div>`;
     box.innerHTML = html + (lyrics.lines.length || lyrics.plain ? `<span class="credit">LRCLIB</span>` : "");
   }
   if (!lyrics.lines.length) return;
@@ -441,8 +485,8 @@ let artFor;
 function renderMusic() {
   const has = media.available;
   $("lyricsBtn").innerHTML = icon(settings.lyricsOpen ? "i-lyrics-on" : "i-lyrics");
-  $("track").textContent = has ? media.title || "Tanpa judul" : "Tidak ada lagu";
-  $("artist").textContent = has ? media.artist || media.app || "" : "Putar dari aplikasi apa saja";
+  $("track").textContent = has ? media.title || "Untitled" : "Nothing playing";
+  $("artist").textContent = has ? media.artist || media.app || "" : "Play music in any app";
   setHtml($("playBtn"), icon(has && media.playing ? "i-pause" : "i-play"));
   const art = $("art");
   const thumb = has ? media.thumbnail : null;
@@ -472,16 +516,22 @@ document.querySelectorAll("[data-media]").forEach((b) =>
 
 const timer = load("timer", {
   mode: "countdown",
-  cd: { secs: 25 * 60, endAt: null, remaining: 25 * 60 * 1000, running: false, label: "Fokus", repeat: false },
+  cd: { secs: 25 * 60, endAt: null, remaining: 25 * 60 * 1000, running: false, label: "Focus", repeat: false },
   sw: { startAt: null, acc: 0, laps: [] },
   presets: [
-    { label: "Fokus", secs: 25 * 60 },
-    { label: "Istirahat", secs: 5 * 60 },
-    { label: "Istirahat panjang", secs: 15 * 60 },
-    { label: "Masak mie", secs: 3 * 60 },
+    { label: "Focus", secs: 25 * 60 },
+    { label: "Break", secs: 5 * 60 },
+    { label: "Long break", secs: 15 * 60 },
+    { label: "Noodles", secs: 3 * 60 },
   ],
 });
 const saveTimer = () => save("timer", timer);
+{
+  // Nama preset bawaan lama (bahasa Indonesia) diganti ke bahasa Inggris.
+  const EN = { Fokus: "Focus", Istirahat: "Break", "Istirahat panjang": "Long break", "Masak mie": "Noodles" };
+  for (const p of timer.presets) p.label = EN[p.label] ?? p.label;
+  timer.cd.label = EN[timer.cd.label] ?? timer.cd.label;
+}
 const RING = 2 * Math.PI * 44;
 
 const hms = (ms, forceH = false) => {
@@ -611,7 +661,7 @@ function renderPresets() {
   $("presets").innerHTML = timer.presets
     .map(
       (p, i) =>
-        `<span class="preset" data-i="${i}"><button class="use">${esc(p.label)} · ${esc(hms(p.secs * 1000))}</button><button class="x" title="Hapus">×</button></span>`,
+        `<span class="preset" data-i="${i}"><button class="use">${esc(p.label)} · ${esc(hms(p.secs * 1000))}</button><button class="x" title="Delete">×</button></span>`,
     )
     .join("");
 }
@@ -634,8 +684,8 @@ function tickTimer() {
   if (cd.running && cd.endAt <= Date.now()) {
     const label = cd.label || "Timer";
     sounds.timer();
-    peek({ icon: "i-timer", ring: 100, color: "#ff4b55", title: `Waktu habis: ${label}`, body: cd.repeat ? "Timer diulang otomatis" : "Buka notch untuk mengatur ulang", ms: 7000 });
-    mascotSay("cheer", `${label} selesai! Kerja bagus 🎉`, 6000);
+    peek({ icon: "i-timer", ring: 100, color: "#ff4b55", title: `Time's up: ${label}`, body: cd.repeat ? "Timer restarted automatically" : "Open the notch to set it again", ms: 7000 });
+    mascotSay("cheer", `${label} done! Great job 🎉`, 6000);
     if (cd.repeat) {
       cd.endAt = Date.now() + cd.secs * 1000;
     } else {
@@ -658,17 +708,17 @@ function renderTimer() {
   if (cdMode) {
     $("fClock").textContent = hms(cdLeft(), cd.secs >= 3600);
     frac = cd.secs ? Math.max(0, cdLeft()) / (cd.secs * 1000) : 0;
-    $("fSub").textContent = cd.remaining === 0 && !cd.running ? "Selesai ✓" : cd.label || "Timer";
+    $("fSub").textContent = cd.remaining === 0 && !cd.running ? "Done ✓" : cd.label || "Timer";
   } else {
     const el = swElapsed();
     $("fClock").textContent = hms(el, el >= 3600000);
     frac = (el % 60000) / 60000;
-    const lap = sw.laps.length ? ` · Putaran ${sw.laps.length}: ${hms(sw.laps[0], sw.laps[0] >= 3600000)}` : "";
-    $("fSub").textContent = (running ? "Berjalan" : el ? "Dijeda" : "Stopwatch") + lap;
+    const lap = sw.laps.length ? ` · Lap ${sw.laps.length}: ${hms(sw.laps[0], sw.laps[0] >= 3600000)}` : "";
+    $("fSub").textContent = (running ? "Running" : el ? "Paused" : "Stopwatch") + lap;
   }
   $("fprg").style.strokeDashoffset = `${RING * (1 - frac)}`;
   setHtml($("fStart"), icon(running ? "i-pause" : "i-play"));
-  setHtml($("fLeft"), cdMode ? `${icon("i-sliders")}Atur` : `${icon("i-flag")}Putaran`);
+  setHtml($("fLeft"), cdMode ? `${icon("i-sliders")}Set` : `${icon("i-flag")}Lap`);
   setHtml($("fMode"), cdMode ? `${icon("i-flag")}Stopwatch` : `${icon("i-timer")}Timer`);
   $("cdRepeat").checked = !!cd.repeat;
 }
@@ -689,10 +739,128 @@ const PRAYER_STYLE = {
   isya: { icon: "🌙", color: "#60a5fa" },
 };
 
+/* Jadwal online:
+ * - Kota di Indonesia: data resmi Kemenag RI (Bimas Islam) lewat api.myquran.com.
+ * - Kuala Lumpur / Singapura / koordinat sendiri: api.aladhan.com (metode JAKIM, MUIS, atau Kemenag).
+ * Jadwal sebulan disimpan dan diperbarui tiap 6 jam, jadi perubahan jadwal ikut terbawa.
+ * Kalau internet mati dan belum ada data, pakai hitungan offline. */
+const FOREIGN = { "Kuala Lumpur": 17, Singapore: 11 };
+const KEYS = ["imsak", "subuh", "terbit", "dzuhur", "ashar", "maghrib", "isya"];
+const prayerCache = load("prayerCache", {});
+let prayerFetching = false;
+let prayerError = "";
+
+function prayerSourceKey() {
+  if (settings.myqId) return `myq:${settings.myqId}`;
+  const method = FOREIGN[settings.city] ?? 20;
+  return `ala:${method}:${(+settings.lat).toFixed(3)},${(+settings.lng).toFixed(3)}`;
+}
+
+const monthKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+
+async function resolveMyqId() {
+  // Kota dari daftar populer: cari ID kotanya di myquran sekali saja.
+  if (settings.myqId || FOREIGN[settings.city] || !CITIES.some(([n]) => n === settings.city)) return;
+  const name = { Solo: "Surakarta" }[settings.city] || settings.city;
+  const res = await invoke("http_json", { url: `https://api.myquran.com/v2/sholat/kota/cari/${encodeURIComponent(name)}` });
+  const list = res?.data || [];
+  const want = `KOTA ${name.toUpperCase()}`;
+  const hit = list.find((c) => c.lokasi === want) || list.find((c) => c.lokasi.endsWith(name.toUpperCase())) || list[0];
+  if (hit) {
+    settings.myqId = hit.id;
+    settings.myqName = hit.lokasi;
+    saveSettings();
+  }
+}
+
+async function fetchPrayerMonth(d) {
+  const y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  const days = {};
+  if (settings.myqId) {
+    const res = await invoke("http_json", { url: `https://api.myquran.com/v2/sholat/jadwal/${settings.myqId}/${y}/${pad(m)}` });
+    for (const j of res?.data?.jadwal || []) days[j.date] = Object.fromEntries(KEYS.map((k) => [k, j[k]]));
+  } else {
+    const method = FOREIGN[settings.city] ?? 20;
+    // Kemenag memakai ihtiyat (pengaman) sekitar 2 menit; aladhan belum, jadi ditambahkan lewat tune.
+    const tune = method === 20 ? "&tune=3,3,-3,3,2,3,0,2,0" : "";
+    const res = await invoke("http_json", {
+      url: `https://api.aladhan.com/v1/calendar/${y}/${m}?latitude=${settings.lat}&longitude=${settings.lng}&method=${method}${tune}`,
+    });
+    const map = { imsak: "Imsak", subuh: "Fajr", terbit: "Sunrise", dzuhur: "Dhuhr", ashar: "Asr", maghrib: "Maghrib", isya: "Isha" };
+    for (const e of res?.data || []) {
+      const [dd, mm, yy] = e.date.gregorian.date.split("-");
+      days[`${yy}-${mm}-${dd}`] = Object.fromEntries(KEYS.map((k) => [k, String(e.timings[map[k]]).slice(0, 5)]));
+    }
+  }
+  return Object.keys(days).length ? days : null;
+}
+
+async function refreshPrayer(force = false) {
+  if (settings.prayerSrc !== "online" || prayerFetching) return;
+  prayerFetching = true;
+  try {
+    await resolveMyqId();
+    const now = new Date();
+    const months = [now, new Date(now.getFullYear(), now.getMonth() + 1, 1)];
+    const keep = new Set();
+    for (const d of months) {
+      const key = `${prayerSourceKey()}|${monthKey(d)}`;
+      keep.add(key);
+      const c = prayerCache[key];
+      if (!force && c && Date.now() - c.fetched < 6 * 3600000) continue;
+      const days = await fetchPrayerMonth(d);
+      if (days) prayerCache[key] = { fetched: Date.now(), days };
+    }
+    for (const k of Object.keys(prayerCache)) if (!keep.has(k)) delete prayerCache[k];
+    save("prayerCache", prayerCache);
+    prayerError = "";
+  } catch (e) {
+    prayerError = String(e?.message || e || "offline");
+  } finally {
+    prayerFetching = false;
+    renderPrayerSource();
+  }
+}
+
+function onlineDay(date) {
+  if (settings.prayerSrc !== "online") return null;
+  const c = prayerCache[`${prayerSourceKey()}|${monthKey(date)}`];
+  return c?.days[todayKey(date)] || null;
+}
+
+function prayerSourceLabel() {
+  if (onlineDay(new Date())) return settings.myqId ? "Kemenag RI" : FOREIGN[settings.city] ? "Aladhan" : "Aladhan · Kemenag";
+  return "Offline calc";
+}
+
+function renderPrayerSource() {
+  const el = $("prayerSrcInfo");
+  if (!el) return;
+  const on = !!onlineDay(new Date());
+  const c = prayerCache[`${prayerSourceKey()}|${monthKey(new Date())}`];
+  el.textContent =
+    settings.prayerSrc !== "online"
+      ? "Using offline calculation (Kemenag method)."
+      : on
+        ? `Source: ${prayerSourceLabel()}${settings.myqName ? " · " + settings.myqName : ""} · updated ${hm(new Date(c.fetched))}`
+        : prayerFetching
+          ? "Downloading prayer times…"
+          : "Couldn't reach the prayer times server, using offline calculation for now.";
+}
+
 function scheduleFor(date) {
-  const t = prayerTimes(date, settings.lat, settings.lng);
   const off = (+settings.offset || 0) * 60000;
   const out = {};
+  const day = onlineDay(date);
+  if (day) {
+    for (const k of KEYS) {
+      const [h, m] = String(day[k]).split(":").map(Number);
+      out[k] = new Date(date.getFullYear(), date.getMonth(), date.getDate(), h, m, 0, 0 + off);
+    }
+    return out;
+  }
+  const t = prayerTimes(date, settings.lat, settings.lng);
   for (const k of Object.keys(t)) out[k] = new Date(t[k].getTime() + off);
   return out;
 }
@@ -718,13 +886,13 @@ function prayerReminders() {
     if (pre && now >= t - pre && now < t && !fired[preKey]) {
       fired[preKey] = 1;
       const mins = Math.max(1, Math.round((t - now) / 60000));
-      peek({ icon: st.icon, ring: 100 - (mins / settings.preMin) * 100, color: st.color, title: `${mins} menit lagi ${p.name}`, body: `Masuk waktu pukul ${hm(today[p.key])}. Siap-siap wudhu yuk`, side: hm(today[p.key]), theme: p.key, ms: 7000 });
+      peek({ icon: st.icon, ring: 100 - (mins / settings.preMin) * 100, color: st.color, title: `${p.name} in ${mins} min`, body: `Starts at ${hm(today[p.key])}. Time to get ready for wudu`, side: hm(today[p.key]), theme: p.key, ms: 7000 });
     }
     if (now >= t && now - t < 10 * 60000 && !fired[nowKey]) {
       fired[nowKey] = fired[preKey] = 1;
       if (settings.prayerSound) sounds.prayer();
-      peek({ icon: st.icon, ring: 100, color: st.color, title: `Waktunya sholat ${p.name}`, body: settings.city, side: hm(today[p.key]), theme: p.key, ms: 12000 });
-      mascotSay("pray", `Sudah masuk waktu ${p.name}. Yuk sholat dulu 🤲`, 9000);
+      peek({ icon: st.icon, ring: 100, color: st.color, title: `It's time for ${p.name}`, body: settings.city, side: hm(today[p.key]), theme: p.key, ms: 12000 });
+      mascotSay("pray", `It's ${p.name} time. Let's pray first 🤲`, 9000);
     }
   }
   // Bersihkan catatan hari-hari sebelumnya.
@@ -743,7 +911,7 @@ function renderPrayer() {
   const s = Math.floor((diff % 60000) / 1000);
   setHtml($("prName"), `<span style="color:${st.color}">${esc(next.name)}</span>`);
   $("prTime").textContent = `${st.icon} ${hm(next.time)}`;
-  $("prCount").textContent = `${h ? h + " jam " : ""}${m} mnt ${pad(s)} dtk lagi · ${settings.city}`;
+  $("prCount").textContent = `${h ? h + "h " : ""}${m}m ${pad(s)}s left · ${settings.city} · ${prayerSourceLabel()}`;
   const html = PRAYERS.map((p) => {
     const t = today[p.key];
     const isNext = next.key === p.key && next.time.toDateString() === now.toDateString();
@@ -775,7 +943,7 @@ async function pollNotifs() {
     if (settings.notifPeek) peek({ icon: "i-bell", ring: 100, color: "#ff9f0a", title: n.app ? `${n.app}: ${n.title}` : n.title, body: n.body, ms: 5000 });
   }
   notifs.splice(30);
-  if (res.items.length && Math.random() < 0.3) mascotSay("shock", `Ada notifikasi dari ${res.items[0].app || "aplikasi"}!`, 3500);
+  if (res.items.length && Math.random() < 0.3) mascotSay("shock", `New notification from ${res.items[0].app || "an app"}!`, 3500);
   if (expanded && page === "notif") renderNotifs();
 }
 
@@ -784,10 +952,10 @@ function renderNotifs() {
   if (notifAccess !== "allowed") {
     html = `<li class="empty">${
       notifAccess === "denied"
-        ? "Akses notifikasi ditolak. Izinkan di Pengaturan Windows → Privasi & keamanan → Notifikasi."
-        : "Windows belum mengizinkan Lentera membaca notifikasi aplikasi lain di perangkat ini."
+        ? "Notification access denied. Allow it in Windows Settings → Privacy & security → Notifications."
+        : "Windows doesn't let Lentera read other apps' notifications on this device yet."
     }</li>`;
-  } else if (!notifs.length) html = `<li class="empty">Belum ada notifikasi baru sejak Lentera dibuka.</li>`;
+  } else if (!notifs.length) html = `<li class="empty">No new notifications since Lentera started.</li>`;
   else
     html = notifs
       .map((n) => `<li><div class="na"><span>${esc(n.app)}</span><span>${hm(n.at)}</span></div><div class="nt">${esc(n.title)}</div><div class="nb">${esc(n.body)}</div></li>`)
@@ -808,7 +976,7 @@ for (const d of Object.keys(water.log)) water.log[d] = water.log[d].map((x) => (
 const saveWater = () => save("water", water);
 const todayLog = () => water.log[todayKey()] || [];
 const waterToday = () => todayLog().reduce((a, b) => a + b.ml, 0);
-const liters = (ml) => (ml / 1000).toLocaleString("id-ID", { maximumFractionDigits: 2 });
+const liters = (ml) => (ml / 1000).toLocaleString("en-US", { maximumFractionDigits: 2 });
 
 function addWater(ml) {
   const k = todayKey();
@@ -823,8 +991,8 @@ function addWater(ml) {
   saveWater();
   sounds.water();
   if (before < water.goal && waterToday() >= water.goal) {
-    peek({ icon: "i-drop", ring: 100, color: "#2f8cff", iconColor: "#5ab4ff", title: "Target minum tercapai!", body: `${liters(water.goal)} L hari ini`, side: "100%" });
-    mascotSay("love", "Target minum tercapai! Tera bangga 💙", 6000);
+    peek({ icon: "i-drop", ring: 100, color: "#2f8cff", iconColor: "#5ab4ff", title: "Water goal reached!", body: `${liters(water.goal)} L today`, side: "100%" });
+    mascotSay("love", "Water goal reached! Tera is proud 💙", 6000);
   }
   renderWater();
 }
@@ -858,13 +1026,13 @@ function renderWater() {
   $("wGoal").textContent = liters(water.goal);
   $("wSwitch").classList.toggle("on", !!water.enabled);
   $("wBar").style.width = `${Math.min(100, pct)}%`;
-  $("waterAdd").querySelector("span").textContent = `Minum ${water.glass} ml`;
+  $("waterAdd").querySelector("span").textContent = `Drink ${water.glass} ml`;
   let sub;
-  if (now >= water.goal) sub = `<b>Target tercapai</b> · ${pct}%`;
-  else if (!water.enabled) sub = `Pengingat mati · ${pct}%`;
+  if (now >= water.goal) sub = `<b>Goal reached</b> · ${pct}%`;
+  else if (!water.enabled) sub = `Reminder off · ${pct}%`;
   else {
     const left = Math.max(0, water.every * 60000 - (Date.now() - (water.lastRemind || Date.now())));
-    sub = `Pengingat berikutnya <b>${Math.max(1, Math.ceil(left / 60000))} mnt</b>`;
+    sub = `Next reminder in <b>${Math.max(1, Math.ceil(left / 60000))} min</b>`;
   }
   setHtml($("wSub"), sub);
 
@@ -935,8 +1103,8 @@ function waterReminder() {
   saveWater();
   sounds.water();
   const pct = Math.round((waterToday() / water.goal) * 100);
-  peek({ icon: "i-drop", ring: pct, color: "#2f8cff", iconColor: "#5ab4ff", title: "Waktunya minum", body: `${liters(waterToday())} / ${liters(water.goal)} L hari ini`, side: `${pct}%`, ms: 7000 });
-  mascotSay("drink", "Glek glek... ayo minum bareng Tera! 💧", 6500);
+  peek({ icon: "i-drop", ring: pct, color: "#2f8cff", iconColor: "#5ab4ff", title: "Time to drink", body: `${liters(waterToday())} / ${liters(water.goal)} L today`, side: `${pct}%`, ms: 7000 });
+  mascotSay("drink", "Gulp gulp... drink with Tera! 💧", 6500);
 }
 
 /* ================= To-do ================= */
@@ -992,7 +1160,7 @@ $("todoList").addEventListener("click", (e) => {
     t.doneAt = t.done ? Date.now() : null;
     if (t.done) {
       sounds.done();
-      if (!todos.some((x) => !x.done)) mascotSay("cheer", "Semua tugas beres! Kamu keren 🥳", 5000);
+      if (!todos.some((x) => !x.done)) mascotSay("cheer", "All tasks done! You're awesome 🥳", 5000);
     }
   }
   saveTodos();
@@ -1014,10 +1182,10 @@ function renderTodos() {
           (t) =>
             `<li data-id="${t.id}" class="${t.done ? "done" : ""}"><span class="check">${t.done ? icon("i-check") : ""}</span><span class="tt">${esc(t.text)}</span>${
               t.time ? `<span class="ttime">${esc(t.time)}</span>` : ""
-            }<button class="act edit" title="Ubah">${icon("i-pencil")}</button><button class="act del" title="Hapus">${icon("i-x")}</button></li>`,
+            }<button class="act edit" title="Edit">${icon("i-pencil")}</button><button class="act del" title="Delete">${icon("i-x")}</button></li>`,
         )
         .join("")
-    : `<li class="empty">Belum ada tugas. Klik "Tambah" ✍️</li>`;
+    : `<li class="empty">No tasks yet. Click "Add" ✍️</li>`;
   setHtml($("todoList"), html);
   const pending = todos.filter((t) => !t.done).length;
   const dt = todos.filter(doneToday).length;
@@ -1038,8 +1206,8 @@ function todoAlerts() {
     const [th, tm] = t.time.split(":").map(Number);
     if (now - new Date(now.getFullYear(), now.getMonth(), now.getDate(), th, tm) > 30 * 60000) continue;
     sounds.timer();
-    peek({ icon: "i-check", ring: 100, color: "#32d74b", title: t.text, body: `Tugas jam ${t.time}`, ms: 8000 });
-    mascotSay("think", `Psst, waktunya: ${t.text}`, 6000);
+    peek({ icon: "i-check", ring: 100, color: "#32d74b", title: t.text, body: `Task at ${t.time}`, ms: 8000 });
+    mascotSay("think", `Psst, it's time: ${t.text}`, 6000);
   }
   if (changed) saveTodos();
 }
@@ -1063,7 +1231,7 @@ const humanSize = (b) => {
     b /= 1024;
     i++;
   } while (b >= 1024 && i < u.length - 1);
-  return `${b.toLocaleString("id-ID", { maximumFractionDigits: 1 })} ${u[i]}`;
+  return `${b.toLocaleString("en-US", { maximumFractionDigits: 1 })} ${u[i]}`;
 };
 
 function addToShelf(paths) {
@@ -1091,10 +1259,10 @@ async function renderShelf() {
       const fi = info.is_dir
         ? `<div class="ficon folder">${icon("i-folder")}</div>`
         : `<div class="ficon" style="background:${EXT_COLORS[ext] || "#d1d1d6"}">${esc(ext.toUpperCase() || "FILE")}</div>`;
-      const meta = !info.exists ? "Tidak ditemukan" : info.is_dir ? "Folder" : humanSize(info.size);
+      const meta = !info.exists ? "Not found" : info.is_dir ? "Folder" : humanSize(info.size);
       return `<li class="file ${info.exists ? "" : "missing"}" data-i="${i}" title="${esc(f.path)}">
         ${fi}<div class="fname">${esc(f.name)}</div><div class="fsize">${meta}</div>
-        <button class="fx" title="Keluarkan dari rak">${icon("i-x")}</button>
+        <button class="fx" title="Remove from shelf">${icon("i-x")}</button>
       </li>`;
     })
     .join("");
@@ -1162,18 +1330,18 @@ listen("tauri://drag-enter", () => {
   setPage("shelf");
   expand(4000);
   notch.classList.add("dragging");
-  $("shelfDropText").textContent = "Lepas untuk menambah";
+  $("shelfDropText").textContent = "Release to add";
   $("shelfEmpty").style.display = "";
 });
 listen("tauri://drag-leave", () => {
   notch.classList.remove("dragging");
-  $("shelfDropText").textContent = "Tarik file ke sini";
+  $("shelfDropText").textContent = "Drop files here";
   renderShelf();
   scheduleCollapse();
 });
 listen("tauri://drag-drop", (e) => {
   notch.classList.remove("dragging");
-  $("shelfDropText").textContent = "Tarik file ke sini";
+  $("shelfDropText").textContent = "Drop files here";
   addToShelf(e.payload?.paths);
   renderShelf();
   expand(2500);
@@ -1192,7 +1360,17 @@ function batteryRing(el) {
   el.style.display = b.present ? "" : "none";
   el.style.setProperty("--p", b.percent ?? 0);
   el.style.setProperty("--c", batteryColor(b));
-  el.title = b.present ? `Baterai ${b.percent}%${b.plugged ? " · mengisi" : ""}` : "";
+  el.title = b.present ? `Battery ${b.percent}%${b.plugged ? " · charging" : ""}` : "";
+}
+
+// Ikon petir muncul di samping baterai saat charger tersambung.
+function renderBattery(pre) {
+  const b = status.battery;
+  batteryRing($(`${pre}Ring`));
+  $(`${pre}Batt`).classList.toggle("charging", !!(b.present && b.plugged));
+  $(`${pre}Batt`).style.display = b.present ? "" : "none";
+  const pct = $(`${pre}Pct`);
+  if (pct) pct.textContent = b.present ? `${b.percent}%` : "";
 }
 
 async function pollStatus() {
@@ -1207,28 +1385,28 @@ async function pollStatus() {
     const ob = status.battery;
     const nb = s.battery;
     if (nb.present && nb.plugged && !ob.plugged) {
-      peek({ icon: "i-bolt", ring: nb.percent, color: "#32d74b", title: "Mengisi daya", body: "Charger tersambung", side: `${nb.percent}%`, ms: 3500 });
+      peek({ icon: "i-bolt", ring: nb.percent, color: "#32d74b", title: "Charging", body: "Charger connected", side: `${nb.percent}%`, ms: 3500 });
     }
     if (nb.present && !nb.plugged) {
       for (const lvl of [20, 10]) {
         if (ob.percent > lvl && nb.percent <= lvl) {
-          peek({ icon: "i-battery-low", ring: nb.percent, color: "#ff453a", iconColor: "#ff453a", title: lvl === 10 ? "Baterai kritis" : "Baterai lemah", body: "Colokkan charger ya", side: `${nb.percent}%` });
-          mascotSay("shock", `Baterai tinggal ${nb.percent}%! 😱`, 5000);
+          peek({ icon: "i-battery-low", ring: nb.percent, color: "#ff453a", iconColor: "#ff453a", title: lvl === 10 ? "Battery critical" : "Battery low", body: "Plug in the charger", side: `${nb.percent}%` });
+          mascotSay("shock", `Only ${nb.percent}% battery left! 😱`, 5000);
         }
       }
     }
     if (nb.present && nb.plugged && nb.percent >= 100 && ob.percent < 100) {
-      peek({ icon: "i-bolt", ring: 100, color: "#32d74b", title: "Baterai penuh", body: "Charger boleh dicabut", side: "100%" });
+      peek({ icon: "i-bolt", ring: 100, color: "#32d74b", title: "Fully charged", body: "You can unplug the charger", side: "100%" });
     }
     if (status.network.internet && !s.network.internet) {
-      peek({ icon: "i-wifi-off", ring: 100, color: "#ffd60a", title: "Wi-Fi terputus", body: s.network.connected ? "Tersambung, tapi tanpa internet" : "Tidak ada jaringan" });
+      peek({ icon: "i-wifi-off", ring: 100, color: "#ffd60a", title: "Wi-Fi disconnected", body: s.network.connected ? "Connected, but no internet" : "No network" });
     } else if (!status.network.internet && s.network.internet) {
-      peek({ icon: "i-wifi", ring: 100, color: "#32d74b", title: "Kembali online", body: s.network.name || "", ms: 3000 });
+      peek({ icon: "i-wifi", ring: 100, color: "#32d74b", title: "Back online", body: s.network.name || "", ms: 3000 });
     }
     for (const d of s.bluetooth)
-      if (!status.bluetooth.includes(d)) peek({ icon: "i-bt", ring: 100, color: "#2f8cff", title: d, body: "Tersambung", sideIcon: "i-headphones", ms: 3500 });
+      if (!status.bluetooth.includes(d)) peek({ icon: "i-bt", ring: 100, color: "#2f8cff", title: d, body: "Connected", sideIcon: "i-headphones", ms: 3500 });
     for (const d of status.bluetooth)
-      if (!s.bluetooth.includes(d)) peek({ icon: "i-bt", ring: 0, color: "#8e8e93", title: d, body: "Terputus", sideIcon: "i-headphones", ms: 3000 });
+      if (!s.bluetooth.includes(d)) peek({ icon: "i-bt", ring: 0, color: "#8e8e93", title: d, body: "Disconnected", sideIcon: "i-headphones", ms: 3000 });
   }
   status = s;
   statusReady = true;
@@ -1238,7 +1416,7 @@ async function pollStatus() {
 
 const langName = (code) => {
   try {
-    return new Intl.DisplayNames(["id"], { type: "language" }).of(code) || code;
+    return new Intl.DisplayNames(["en"], { type: "language" }).of(code) || code;
   } catch {
     return code;
   }
@@ -1249,9 +1427,9 @@ listen("lentera-input", (e) => {
   if (!settings.overlays || expanded) return;
   if (ev.kind === "volume") {
     const muted = ev.muted || ev.volume === 0;
-    peek({ key: "volume", urgent: true, small: true, icon: muted ? "i-mute" : "i-vol", ring: muted ? 0 : ev.volume, color: "#fff", title: muted ? "Bisu" : "Volume", side: muted ? "" : `${ev.volume}`, bar: muted ? 0 : ev.volume, ms: 1500 });
+    peek({ key: "volume", urgent: true, small: true, icon: muted ? "i-mute" : "i-vol", ring: muted ? 0 : ev.volume, color: "#fff", title: muted ? "Muted" : "Volume", side: muted ? "" : `${ev.volume}`, bar: muted ? 0 : ev.volume, ms: 1500 });
   } else if (ev.kind === "caps") {
-    peek({ key: "caps", urgent: true, small: true, icon: "i-caps", ring: ev.caps ? 100 : 0, color: "#32d74b", title: ev.caps ? "Caps Lock aktif" : "Caps Lock mati", ms: 1300 });
+    peek({ key: "caps", urgent: true, small: true, icon: "i-caps", ring: ev.caps ? 100 : 0, color: "#32d74b", title: ev.caps ? "Caps Lock on" : "Caps Lock off", ms: 1300 });
   } else if (ev.kind === "lang") {
     peek({ key: "lang", urgent: true, small: true, icon: "i-key", ring: 100, color: "#2f8cff", title: langName(ev.lang), side: ev.lang.split("-")[0].toUpperCase(), ms: 1500 });
   }
@@ -1290,10 +1468,11 @@ function renderMini() {
 
   // Prioritas teks: sholat sebentar lagi > timer berjalan > lirik.
   let text = "";
-  if (prayerSoon) text = `<span style="color:${st.color}">${st.icon} ${next.name} ${Math.max(1, Math.ceil(minsToPrayer))} mnt lagi</span>`;
+  if (prayerSoon) text = `<span style="color:${st.color}">${st.icon} ${next.name} in ${Math.max(1, Math.ceil(minsToPrayer))} min</span>`;
   else if (timer.cd.running) text = `<span style="color:#ff4b55">⏱ ${hms(cdLeft())}</span>${timer.cd.label ? ` · ${esc(timer.cd.label)}` : ""}`;
   else if (timer.sw.startAt != null) text = `<span style="color:#5ab4ff">⏱ ${hms(swElapsed(), true)}</span>`;
-  else if (settings.miniLyrics && playing && lyrics.lines.length) text = esc(lyrics.lines[currentLyricIndex()]?.text || "♪");
+  // Mode garis tipis: lirik tidak dimunculkan supaya notch tetap jadi garis saat tidak dipakai.
+  else if (settings.miniLyrics && !settings.minimal && playing && lyrics.lines.length) text = esc(lyrics.lines[currentLyricIndex()]?.text || "♪");
 
   const waving = Date.now() < wavingUntil;
   const showEyes = !expanded && !peekCur && eyesAllowed() && (idleLevel > 0 || waving);
@@ -1307,7 +1486,7 @@ function renderMini() {
   if (prayerSoon) notch.style.setProperty("--accent", st.color);
   else notch.style.removeProperty("--accent");
 
-  batteryRing($("miniRing"));
+  renderBattery("mini");
   $("miniWave").classList.toggle("on", playing);
   $("miniWave").style.visibility = media.available ? "" : "hidden";
   const clock = hm(now);
@@ -1322,34 +1501,79 @@ function titleFor(p) {
   if (p === "timer") return timer.mode === "countdown" ? "Timer" : "Stopwatch";
   if (p === "prayer") {
     const st = PRAYER_STYLE[upcomingPrayer().key];
-    return `Jadwal <em style="color:${st.color}">Sholat</em>`;
+    return `Prayer <em style="color:${st.color}">Times</em>`;
   }
-  if (p === "water") return `Pengingat <em style="color:#2f8cff">Minum</em>`;
-  if (p === "shelf") return "Rak";
-  if (p === "todo") return `Daftar<em style="color:#32d74b">Tugas</em>`;
-  if (p === "notif") return "Notifikasi";
-  return "Pengaturan";
+  if (p === "water") return `Drink <em style="color:#2f8cff">Water</em>`;
+  if (p === "shelf") return "Shelf";
+  if (p === "todo") return `To-do <em style="color:#32d74b">List</em>`;
+  if (p === "notif") return "Notifications";
+  return "Settings";
 }
 
 function renderHead() {
   const now = new Date();
-  setHtml($("ptitle"), titleFor(page));
+  setHtml($("ptitle"), settingsOpen ? "Settings" : titleFor(page));
   $("clockBig").textContent = hm(now);
-  $("dateBig").textContent = now.toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short" });
-  batteryRing($("headRing"));
+  $("dateBig").textContent = now.toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "short" });
+  renderBattery("head");
   $("headWave").classList.toggle("on", media.available && media.playing);
   $("headWave").style.visibility = media.available ? "" : "hidden";
 }
 
 /* ================= Pengaturan ================= */
 
+const titleCase = (t) => t.toLowerCase().replace(/(^|[\s.(])\S/g, (c) => c.toUpperCase());
+
+// Daftar kota: hasil pencarian (kalau ada), kota terpilih dari pencarian, lalu kota populer.
+function fillCities(found = []) {
+  const sel = $("setCity");
+  const extra = [...found];
+  if (settings.myqId && !found.some((c) => String(c.id) === String(settings.myqId)) && !CITIES.some(([n]) => n === settings.city))
+    extra.unshift({ id: settings.myqId, lokasi: settings.myqName || settings.city });
+  const opt = (c) => `<option value="myq:${esc(c.id)}" data-name="${esc(c.lokasi)}">${esc(titleCase(c.lokasi))}</option>`;
+  sel.innerHTML =
+    (extra.length ? `<optgroup label="Search results">${extra.map(opt).join("")}</optgroup>` : "") +
+    `<optgroup label="Popular cities">${CITIES.map(([name]) => `<option value="${esc(name)}">${esc(name)}</option>`).join("")}</optgroup>` +
+    `<option value="__custom">Other (set coordinates)</option>`;
+  const inList = CITIES.some(([n]) => n === settings.city);
+  sel.value = inList ? settings.city : settings.myqId ? `myq:${settings.myqId}` : "__custom";
+  $("customLoc").hidden = sel.value !== "__custom";
+}
+
 function initSettings() {
   const sel = $("setCity");
-  sel.innerHTML =
-    CITIES.map(([name]) => `<option value="${esc(name)}">${esc(name)}</option>`).join("") + `<option value="__custom">Lainnya (atur sendiri)</option>`;
-  const isCustom = !CITIES.some(([n]) => n === settings.city);
-  sel.value = isCustom ? "__custom" : settings.city;
-  $("customLoc").hidden = !isCustom;
+  fillCities();
+  $("setScale").value = String(settings.scale);
+  $("setScale").addEventListener("change", (e) => {
+    settings.scale = +e.target.value;
+    saveSettings();
+    applyScale();
+  });
+  $("setPrayerSrc").value = settings.prayerSrc;
+  $("setPrayerSrc").addEventListener("change", (e) => {
+    settings.prayerSrc = e.target.value;
+    saveSettings();
+    refreshPrayer(true);
+    renderPrayerSource();
+  });
+  // Cari kabupaten/kota lain di Indonesia (data Kemenag).
+  const search = async () => {
+    const q = $("citySearch").value.trim();
+    if (q.length < 3) return;
+    $("citySearchBtn").textContent = "…";
+    const res = await invoke("http_json", { url: `https://api.myquran.com/v2/sholat/kota/cari/${encodeURIComponent(q)}` }).catch(() => null);
+    $("citySearchBtn").textContent = "Search";
+    const list = res?.data || [];
+    if (!list.length) {
+      $("prayerSrcInfo").textContent = res ? `No city found for "${q}".` : "Couldn't search right now, check your internet.";
+      return;
+    }
+    fillCities(list);
+    sel.value = `myq:${list[0].id}`;
+    sel.dispatchEvent(new Event("change"));
+  };
+  $("citySearchBtn").addEventListener("click", search);
+  $("citySearch").addEventListener("keydown", (e) => e.key === "Enter" && search());
   $("setLat").value = settings.lat;
   $("setLng").value = settings.lng;
   $("setName").value = settings.name;
@@ -1375,10 +1599,16 @@ function initSettings() {
   $("setAutostart").addEventListener("change", (e) => autostart.set(e.target.checked).catch(() => {}));
 
   sel.addEventListener("change", () => {
-    if (sel.value === "__custom") {
-      settings.city = "Lokasi saya";
+    if (sel.value.startsWith("myq:")) {
+      const opt = sel.selectedOptions[0];
+      Object.assign(settings, { myqId: sel.value.slice(4), myqName: opt.dataset.name, city: opt.textContent });
+      $("customLoc").hidden = true;
+    } else if (sel.value === "__custom") {
+      Object.assign(settings, { city: "My location", myqId: null, myqName: "" });
       $("customLoc").hidden = false;
     } else {
+      settings.myqId = null;
+      settings.myqName = "";
       const c = CITIES.find(([n]) => n === sel.value);
       Object.assign(settings, { city: c[0], lat: c[1], lng: c[2] });
       $("setLat").value = c[1];
@@ -1386,6 +1616,8 @@ function initSettings() {
       $("customLoc").hidden = true;
     }
     saveSettings();
+    refreshPrayer(true);
+    renderAll();
   });
   const bind = (id, key, conv) =>
     $(id).addEventListener("change", (e) => {
@@ -1395,6 +1627,7 @@ function initSettings() {
     });
   bind("setLat", "lat", Number);
   bind("setLng", "lng", Number);
+  ["setLat", "setLng", "setOffset"].forEach((id) => $(id).addEventListener("change", () => refreshPrayer(true)));
   bind("setName", "name", (v) => v.trim());
   bind("setPreMin", "preMin", Number);
   bind("setOffset", "offset", (v) => Math.max(-15, Math.min(15, Number(v) || 0)));
@@ -1404,10 +1637,10 @@ function initSettings() {
   $("resetAll").addEventListener("click", (e) => {
     if (!armed) {
       armed = true;
-      e.target.textContent = "Yakin? Klik sekali lagi untuk menghapus";
+      e.target.textContent = "Sure? Click again to erase";
       setTimeout(() => {
         armed = false;
-        e.target.textContent = "Hapus semua data Lentera";
+        e.target.textContent = "Erase all Lentera data";
       }, 4000);
       return;
     }
@@ -1428,6 +1661,7 @@ function renderAll() {
   if (page === "water") renderWater();
   if (page === "todo") renderTodos();
   if (page === "notif") renderNotifs();
+  if (settingsOpen) renderPrayerSource();
 }
 
 initSettings();
@@ -1441,6 +1675,8 @@ setInterval(() => {
   renderAll();
 }, 250);
 setInterval(prayerReminders, 5000);
+setInterval(refreshPrayer, 15 * 60000);
+refreshPrayer();
 setInterval(waterReminder, 30000);
 setInterval(todoAlerts, 15000);
 setInterval(pollMedia, 1000);

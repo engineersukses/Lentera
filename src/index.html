@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -54,7 +54,7 @@
         <div class="body">
           <!-- Notch tertutup: cincin baterai, jam, gelombang suara -->
           <div class="mini">
-            <span class="ring-mini" id="miniRing"></span>
+            <span class="batt" id="miniBatt"><span class="ring-mini" id="miniRing"></span><svg class="bolt" id="miniBolt"><use href="#i-bolt" /></svg></span>
             <div class="mini-center">
               <div class="mini-clock" id="miniClock"></div>
               <div class="mini-text" id="miniText"></div>
@@ -77,13 +77,16 @@
           <!-- Notch terbuka -->
           <div class="panel">
             <header class="phead">
-              <div class="ptitle" id="ptitle"></div>
-              <div class="pdate"><span class="ring-mini" id="headRing"></span><span id="dateBig"></span><b id="clockBig"></b></div>
+              <div class="pleft">
+                <button class="gear" id="gearBtn" title="Settings"><svg><use href="#i-gear" /></svg></button>
+                <div class="ptitle" id="ptitle"></div>
+              </div>
+              <div class="pdate"><span class="batt" id="headBatt"><span class="ring-mini" id="headRing"></span><span id="headPct"></span><svg class="bolt" id="headBolt"><use href="#i-bolt" /></svg></span><span id="dateBig"></span><b id="clockBig"></b></div>
               <span class="wave" id="headWave"><i></i><i></i><i></i><i></i><i></i></span>
             </header>
 
-            <button class="nav nav-l" id="navL" title="Sebelumnya"><svg><use href="#i-left" /></svg></button>
-            <button class="nav nav-r" id="navR" title="Berikutnya"><svg><use href="#i-right" /></svg></button>
+            <button class="nav nav-l" id="navL" title="Previous"><svg><use href="#i-left" /></svg></button>
+            <button class="nav nav-r" id="navR" title="Next"><svg><use href="#i-right" /></svg></button>
 
             <!-- Musik -->
             <section class="page" data-page="music">
@@ -99,11 +102,11 @@
                   <span id="tLeft">-00:00</span>
                 </div>
                 <div class="pctrl">
-                  <button class="lyr" id="lyricsBtn" title="Lirik"><svg><use href="#i-lyrics" /></svg></button>
+                  <button class="lyr" id="lyricsBtn" title="Lyrics"><svg><use href="#i-lyrics" /></svg></button>
                   <div class="pbtns">
-                    <button data-media="prev" title="Sebelumnya"><svg><use href="#i-rew" /></svg></button>
-                    <button data-media="toggle" class="pp" id="playBtn" title="Putar/Jeda"><svg><use href="#i-play" /></svg></button>
-                    <button data-media="next" title="Berikutnya"><svg><use href="#i-ff" /></svg></button>
+                    <button data-media="prev" title="Previous"><svg><use href="#i-rew" /></svg></button>
+                    <button data-media="toggle" class="pp" id="playBtn" title="Play/Pause"><svg><use href="#i-play" /></svg></button>
+                    <button data-media="next" title="Next"><svg><use href="#i-ff" /></svg></button>
                   </div>
                 </div>
               </div>
@@ -118,8 +121,8 @@
                   <svg class="ficon"><use href="#i-timer" /></svg>
                 </div>
                 <div class="fmain">
-                  <div class="fclock"><span id="fClock">25:00</span><button class="round" id="fReset" title="Ulang"><svg><use href="#i-reset" /></svg></button></div>
-                  <div class="fsub" id="fSub">Fokus</div>
+                  <div class="fclock"><span id="fClock">25:00</span><button class="round" id="fReset" title="Reset"><svg><use href="#i-reset" /></svg></button></div>
+                  <div class="fsub" id="fSub">Focus</div>
                   <div class="fbtns">
                     <button class="pill" id="fLeft"></button>
                     <button class="pill go" id="fStart"><svg><use href="#i-play" /></svg></button>
@@ -129,17 +132,17 @@
                 <!-- Pengaturan timer -->
                 <div class="fedit" id="fEdit" hidden>
                   <div class="fe-row">
-                    <label><input type="number" id="cdH" min="0" max="23" value="0" /><span>jam</span></label>
-                    <label><input type="number" id="cdM" min="0" max="59" value="25" /><span>mnt</span></label>
-                    <label><input type="number" id="cdS" min="0" max="59" value="0" /><span>dtk</span></label>
-                    <input type="text" id="cdLabel" placeholder="Nama, mis. Belajar" maxlength="24" />
+                    <label><input type="number" id="cdH" min="0" max="23" value="0" /><span>h</span></label>
+                    <label><input type="number" id="cdM" min="0" max="59" value="25" /><span>m</span></label>
+                    <label><input type="number" id="cdS" min="0" max="59" value="0" /><span>s</span></label>
+                    <input type="text" id="cdLabel" placeholder="Name, e.g. Study" maxlength="24" />
                   </div>
                   <div class="presets" id="presets"></div>
                   <div class="fe-row">
-                    <label class="chk"><input type="checkbox" id="cdRepeat" /> Ulangi otomatis</label>
+                    <label class="chk"><input type="checkbox" id="cdRepeat" /> Repeat automatically</label>
                     <span class="grow"></span>
-                    <button class="pill" id="cdSave"><svg><use href="#i-plus" /></svg>Simpan preset</button>
-                    <button class="pill light" id="fEditDone">Selesai</button>
+                    <button class="pill" id="cdSave"><svg><use href="#i-plus" /></svg>Save preset</button>
+                    <button class="pill light" id="fEditDone">Done</button>
                   </div>
                 </div>
               </div>
@@ -163,25 +166,25 @@
                 <div class="w-left">
                   <div class="w-top">
                     <div class="w-num"><b id="wNow">0</b><span> / <span id="wGoal">2</span> L</span></div>
-                    <button class="switch" id="wSwitch" title="Pengingat minum"><i><svg><use href="#i-bell" /></svg></i></button>
+                    <button class="switch" id="wSwitch" title="Drink reminder"><i><svg><use href="#i-bell" /></svg></i></button>
                   </div>
                   <div class="w-sub" id="wSub"></div>
                   <div class="w-bar"><i id="wBar"></i></div>
                   <div class="w-btns">
-                    <button class="pill blue" id="waterAdd"><svg><use href="#i-drop" /></svg><span>Minum</span></button>
-                    <button class="pill" id="waterSetBtn"><svg><use href="#i-sliders" /></svg>Atur</button>
+                    <button class="pill blue" id="waterAdd"><svg><use href="#i-drop" /></svg><span>Drink</span></button>
+                    <button class="pill" id="waterSetBtn"><svg><use href="#i-sliders" /></svg>Adjust</button>
                   </div>
                 </div>
                 <div class="w-right">
                   <div class="chart" id="waterChart"></div>
                   <div class="w-set" id="waterSet" hidden>
                     <div class="ws-row"><span>Target</span><span class="chips" id="goalChips"></span></div>
-                    <div class="ws-row"><span>Botol/gelas</span><span class="chips" id="glassChips"></span></div>
-                    <div class="ws-row"><span>Jam pengingat</span><span class="hours"><input type="number" id="wFrom" min="0" max="23" /> – <input type="number" id="wTo" min="1" max="24" /></span></div>
-                    <div class="ws-row"><span>Ingatkan tiap</span>
-                      <select id="wEvery"><option value="30">30 menit</option><option value="45">45 menit</option><option value="60">1 jam</option><option value="90">1,5 jam</option><option value="120">2 jam</option></select>
+                    <div class="ws-row"><span>Glass size</span><span class="chips" id="glassChips"></span></div>
+                    <div class="ws-row"><span>Active hours</span><span class="hours"><input type="number" id="wFrom" min="0" max="23" /> – <input type="number" id="wTo" min="1" max="24" /></span></div>
+                    <div class="ws-row"><span>Remind every</span>
+                      <select id="wEvery"><option value="30">30 min</option><option value="45">45 min</option><option value="60">1 hour</option><option value="90">1.5 hours</option><option value="120">2 hours</option></select>
                     </div>
-                    <div class="ws-row"><span></span><button class="link" id="waterUndo">Batalkan minum terakhir</button></div>
+                    <div class="ws-row"><span></span><button class="link" id="waterUndo">Undo last drink</button></div>
                   </div>
                 </div>
               </div>
@@ -192,11 +195,11 @@
               <div class="shelf" id="shelf">
                 <div class="shelf-empty" id="shelfEmpty">
                   <svg><use href="#i-inbox" /></svg>
-                  <b id="shelfDropText">Tarik file ke sini</b>
-                  <span>Tarik keluar kapan saja · klik untuk membuka</span>
+                  <b id="shelfDropText">Drop files here</b>
+                  <span>Drag them out anytime · click to open</span>
                 </div>
                 <ul class="shelf-items" id="shelfItems"></ul>
-                <button class="shelf-clear" id="shelfClear" title="Kosongkan rak">Kosongkan</button>
+                <button class="shelf-clear" id="shelfClear" title="Clear shelf">Clear</button>
               </div>
             </section>
 
@@ -205,18 +208,18 @@
               <div class="todo">
                 <div class="t-left">
                   <div class="t-score" id="todoScore">0/0</div>
-                  <div class="t-sub">Selesai hari ini</div>
+                  <div class="t-sub">Done today</div>
                   <div class="t-btns">
-                    <button class="pill" id="todoAddBtn"><svg><use href="#i-plus" /></svg>Tambah</button>
-                    <button class="pill" id="todoEditBtn"><svg><use href="#i-pencil" /></svg>Ubah</button>
+                    <button class="pill" id="todoAddBtn"><svg><use href="#i-plus" /></svg>Add</button>
+                    <button class="pill" id="todoEditBtn"><svg><use href="#i-pencil" /></svg>Edit</button>
                   </div>
                 </div>
                 <div class="t-right">
                   <form class="t-form" id="todoForm" hidden>
-                    <input type="text" id="todoInput" placeholder="Nama tugas" maxlength="120" />
-                    <input type="time" id="todoTime" title="Jam pengingat (opsional)" />
-                    <button class="round ok" id="todoSubmit" title="Simpan"><svg><use href="#i-check" /></svg></button>
-                    <button class="round" type="button" id="todoCancel" title="Batal"><svg><use href="#i-x" /></svg></button>
+                    <input type="text" id="todoInput" placeholder="Task name" maxlength="120" />
+                    <input type="time" id="todoTime" title="Reminder time (optional)" />
+                    <button class="round ok" id="todoSubmit" title="Save"><svg><use href="#i-check" /></svg></button>
+                    <button class="round" type="button" id="todoCancel" title="Cancel"><svg><use href="#i-x" /></svg></button>
                   </form>
                   <ul class="t-list" id="todoList"></ul>
                 </div>
@@ -231,26 +234,36 @@
             <!-- Pengaturan -->
             <section class="page" data-page="settings">
               <div class="settings">
-                <label>Nama panggilan <input type="text" id="setName" maxlength="20" placeholder="mis. Claudia" /></label>
-                <label>Kota (jadwal sholat) <select id="setCity"></select></label>
-                <label class="custom-loc" id="customLoc">Lintang / Bujur
+                <label>Nickname <input type="text" id="setName" maxlength="20" placeholder="e.g. Claudia" /></label>
+                <label>Notch size <select id="setScale">
+                  <option value="0.5">Small (50%)</option><option value="0.6">60%</option><option value="0.75">75%</option><option value="1">Large (100%)</option>
+                </select></label>
+                <label>Prayer city <select id="setCity"></select></label>
+                <label>Find another city (Indonesia)
+                  <span class="pair"><input type="text" id="citySearch" placeholder="e.g. Sleman" /><button class="pill small" id="citySearchBtn">Search</button></span>
+                </label>
+                <label class="custom-loc" id="customLoc">Latitude / Longitude
                   <span class="pair"><input type="number" step="0.0001" id="setLat" /><input type="number" step="0.0001" id="setLng" /></span>
                 </label>
-                <label>Ingatkan sebelum sholat <select id="setPreMin">
-                  <option value="0">Tidak</option><option value="5">5 menit</option><option value="10">10 menit</option><option value="15">15 menit</option><option value="30">30 menit</option>
+                <label>Prayer times source <select id="setPrayerSrc">
+                  <option value="online">Online (Kemenag RI, auto-updates)</option><option value="offline">Offline calculation</option>
                 </select></label>
-                <label>Koreksi jadwal sholat (menit) <input type="number" id="setOffset" min="-15" max="15" value="0" /></label>
-                <label>Tera muncul setiap <select id="setMascot">
-                  <option value="0">Matikan</option><option value="2">2 menit</option><option value="4">4 menit</option><option value="7">7 menit</option><option value="10">10 menit</option><option value="20">20 menit</option>
+                <label>Remind before prayer <select id="setPreMin">
+                  <option value="0">Off</option><option value="5">5 min</option><option value="10">10 min</option><option value="15">15 min</option><option value="30">30 min</option>
                 </select></label>
-                <label class="chk"><input type="checkbox" id="setPrayerSound" /> Bunyi saat masuk waktu sholat</label>
-                <label class="chk"><input type="checkbox" id="setEyes" /> Maskot mata saat komputer diam</label>
-                <label class="chk"><input type="checkbox" id="setMinimal" /> Notch minimal (garis tipis)</label>
-                <label class="chk"><input type="checkbox" id="setMiniLyrics" /> Lirik di notch tertutup</label>
-                <label class="chk"><input type="checkbox" id="setNotifPeek" /> Tampilkan notifikasi aplikasi lain</label>
-                <label class="chk"><input type="checkbox" id="setOverlays" /> Tampilan volume, Caps Lock &amp; bahasa</label>
-                <label class="chk"><input type="checkbox" id="setAutostart" /> Jalankan saat Windows menyala</label>
-                <button class="link danger" id="resetAll">Hapus semua data Lentera</button>
+                <label>Manual correction (min) <input type="number" id="setOffset" min="-15" max="15" value="0" /></label>
+                <label>Tera appears every <select id="setMascot">
+                  <option value="0">Off</option><option value="2">2 min</option><option value="4">4 min</option><option value="7">7 min</option><option value="10">10 min</option><option value="20">20 min</option>
+                </select></label>
+                <div class="set-status" id="prayerSrcInfo"></div>
+                <label class="chk"><input type="checkbox" id="setMinimal" /> Thin line when not in use</label>
+                <label class="chk"><input type="checkbox" id="setPrayerSound" /> Sound at prayer time</label>
+                <label class="chk"><input type="checkbox" id="setEyes" /> Sleepy eyes when PC is idle</label>
+                <label class="chk"><input type="checkbox" id="setMiniLyrics" /> Lyrics in the closed notch</label>
+                <label class="chk"><input type="checkbox" id="setNotifPeek" /> Show other apps' notifications</label>
+                <label class="chk"><input type="checkbox" id="setOverlays" /> Volume, Caps Lock &amp; language pop-ups</label>
+                <label class="chk"><input type="checkbox" id="setAutostart" /> Start with Windows</label>
+                <button class="link danger" id="resetAll">Erase all Lentera data</button>
               </div>
             </section>
 
