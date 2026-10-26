@@ -35,8 +35,8 @@ async fn blocking<T: Send + Default + 'static>(f: impl FnOnce() -> T + Send + 's
 }
 
 #[tauri::command]
-async fn media_info() -> system::MediaInfo {
-    blocking(system::media_info).await
+async fn media_info(thumb_key: Option<String>) -> system::MediaInfo {
+    blocking(move || system::media_info(thumb_key.as_deref().unwrap_or(""))).await
 }
 
 #[tauri::command]

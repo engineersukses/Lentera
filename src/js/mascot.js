@@ -57,20 +57,26 @@ const ARM = [
 
 const TOP = 8; // baris sprite dimulai di bawah benang jaring
 
-function px(x, y, c) {
-  return `<rect x="${x}" y="${y + TOP}" width="1.02" height="1.02" fill="${PALETTE[c]}"/>`;
+// Piksel digabung jadi satu <path> per warna (bukan ratusan <rect>), supaya
+// animasi ayunan tidak membuat browser menghitung ulang ratusan elemen.
+function paths(pixels) {
+  const byColor = {};
+  for (const [x, y, c] of pixels) (byColor[c] ??= []).push(`M${x} ${y + TOP}h1.02v1.02h-1.02z`);
+  return Object.entries(byColor)
+    .map(([c, d]) => `<path fill="${PALETTE[c]}" d="${d.join("")}"/>`)
+    .join("");
 }
 
 function grid(rows, filter = () => true, color) {
-  let out = "";
-  rows.forEach((row, y) => [...row].forEach((c, x) => c !== "." && filter(c, x, y) && (out += px(x, y, color?.(c, x, y) ?? c))));
-  return out;
+  const px = [];
+  rows.forEach((row, y) => [...row].forEach((c, x) => c !== "." && filter(c, x, y) && px.push([x, y, color?.(c, x, y) ?? c])));
+  return paths(px);
 }
 
 function arm(mirror) {
-  let out = "";
-  for (const [y, row] of ARM) [...row].forEach((c, i) => c !== "." && (out += px(mirror ? W - 1 - i : i, y, c)));
-  return out;
+  const px = [];
+  for (const [y, row] of ARM) [...row].forEach((c, i) => c !== "." && px.push([mirror ? W - 1 - i : i, y, c]));
+  return paths(px);
 }
 
 // Mata (bagian putih) dipisah supaya bisa berkedip / tertutup / membesar.

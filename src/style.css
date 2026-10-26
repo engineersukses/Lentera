@@ -2867,3 +2867,34 @@ body.no-glass .mascot {
   width: 1em;
   height: 1em;
 }
+
+/* =====================================================================
+   v1.4.3: hemat CPU. Animasi hanya berjalan saat bagiannya terlihat.
+   ===================================================================== */
+
+/* Mata hanya berkedip saat notch sedang menampilkan mata */
+#notch:not(.idle) .eyes i,
+#notch:not(.idle) .eyes .zz {
+  animation: none;
+}
+
+/* Spidey diam total saat tidak muncul */
+.mascot:not(.show),
+.mascot:not(.show) * {
+  animation: none !important;
+}
+
+/* Gelombang musik: hanya yang sedang terlihat yang bergerak */
+#notch.expanded .mini .wave i,
+#notch.peeking .mini .wave i,
+#notch.idle .mini .wave i,
+#notch.collapsed.minimal:not(.wide) .mini .wave i,
+#notch:not(.expanded) .phead .wave i {
+  animation: none;
+}
+
+/* Garis tinta (filter SVG) di lapisan sendiri supaya tidak digambar ulang
+   setiap kali isi notch bergerak */
+#notch .body::after {
+  will-change: transform;
+}

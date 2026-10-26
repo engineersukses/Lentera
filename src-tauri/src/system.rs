@@ -19,6 +19,8 @@ pub struct MediaInfo {
     pub updated_unix_ms: i64,
     /// Sampul album sebagai data URL, kalau ada.
     pub thumbnail: Option<String>,
+    /// Kunci sampul; kalau sama dengan milik tampilan, sampul tidak dikirim ulang.
+    pub thumb_key: String,
 }
 
 #[derive(Serialize, Default)]
@@ -86,7 +88,7 @@ pub use stub::*;
 #[cfg(not(windows))]
 mod stub {
     use super::*;
-    pub fn media_info() -> MediaInfo {
+    pub fn media_info(_known_thumb: &str) -> MediaInfo {
         MediaInfo::default()
     }
     pub fn media_control(_action: &str) {}
@@ -130,11 +132,11 @@ mod imp {
         SessionManager::RequestAsync()?.get()?.GetCurrentSession()
     }
 
-    pub fn media_info() -> MediaInfo {
-        read_media().unwrap_or_default()
+    pub fn media_info(known_thumb: &str) -> MediaInfo {
+        read_media(known_thumb).unwrap_or_default()
     }
 
-    fn read_media() -> Result<MediaInfo> {
+    fn read_media(known_thumb: &str) -> Result<MediaInfo> {
         let s = session()?;
         let props = s.TryGetMediaPropertiesAsync()?.get()?;
         let timeline = s.GetTimelineProperties()?;
@@ -158,6 +160,8 @@ mod imp {
             }
         };
 
+        let thumb_key = if thumbnail.is_some() { key } else { String::new() };
+        let thumbnail = if !thumb_key.is_empty() && thumb_key == known_thumb { None } else { thumbnail };
         let start = timeline.StartTime()?.Duration;
         Ok(MediaInfo {
             available: true,
@@ -170,6 +174,7 @@ mod imp {
             duration_ms: (timeline.EndTime()?.Duration - start) / 10_000,
             updated_unix_ms: (timeline.LastUpdatedTime()?.UniversalTime - EPOCH_DIFF) / 10_000,
             thumbnail,
+            thumb_key,
         })
     }
 
@@ -249,7 +254,7 @@ mod imp {
             let mut last_vol: Option<(u8, bool)> = None;
             let mut tick: u32 = 0;
             loop {
-                std::thread::sleep(std::time::Duration::from_millis(150));
+                std::thread::sleep(std::time::Duration::from_millis(200));
                 tick = tick.wrapping_add(1);
 
                 let caps = unsafe { GetKeyState(VK_CAPITAL.0 as i32) } & 1 != 0;
@@ -273,7 +278,7 @@ mod imp {
                 }
 
                 // Perangkat audio bisa berganti (mis. headphone dicolok), ambil ulang tiap ±3 detik.
-                if tick.is_multiple_of(20) {
+                if tick.is_multiple_of(15) {
                     vol_ep = endpoint().ok();
                 }
                 if let Some(ep) = &vol_ep {
@@ -326,7 +331,21 @@ mod imp {
         }
     }
 
+    /// Mencari perangkat Bluetooth cukup berat, jadi hasilnya dipakai ulang ±30 detik.
     fn bluetooth() -> Vec<String> {
+        static CACHE: Mutex<Option<(std::time::Instant, Vec<String>)>> = Mutex::new(None);
+        let mut cache = CACHE.lock().unwrap();
+        if let Some((at, names)) = cache.as_ref() {
+            if at.elapsed() < std::time::Duration::from_secs(30) {
+                return names.clone();
+            }
+        }
+        let names = find_bluetooth();
+        *cache = Some((std::time::Instant::now(), names.clone()));
+        names
+    }
+
+    fn find_bluetooth() -> Vec<String> {
         let mut names = Vec::new();
         let selectors = [
             BluetoothDevice::GetDeviceSelectorFromConnectionStatus(BluetoothConnectionStatus::Connected),

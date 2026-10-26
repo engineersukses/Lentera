@@ -238,12 +238,15 @@ function syncInteractive() {
   }
   // Tera selalu menempel di sisi kanan notch (di luar lengkungan telinga).
   // Posisi style dihitung dalam satuan sebelum zoom.
-  const left = r.right / z + 14;
+  // Hanya diperbarui saat Spidey tampil, dan hanya kalau posisinya berubah.
+  if (!mascot.isVisible()) return;
+  const left = `${r.right / z + 14}px`;
   const bubble = $("bubble");
-  $("mascot").style.left = `${left}px`;
-  bubble.style.left = `${Math.min(left + 104, window.innerWidth / z - bubble.offsetWidth - 6)}px`;
+  if ($("mascot").style.left !== left) $("mascot").style.left = left;
+  const bl = `${Math.min(parseFloat(left) + 104, window.innerWidth / z - bubble.offsetWidth - 6)}px`;
+  if (bubble.style.left !== bl) bubble.style.left = bl;
 }
-setInterval(syncInteractive, 60);
+setInterval(syncInteractive, 100);
 
 
 /* ================= Kartu sekilas (peek) ================= */
@@ -338,6 +341,7 @@ function mascotSay(action, text, ms) {
   if (!settings.mascotEvery || expanded) return;
   lastMascot = Date.now();
   mascot.show(action, text, ms);
+  syncInteractive();
 }
 
 $("mascot").addEventListener("click", () => {
@@ -388,8 +392,10 @@ const fmt = (ms) => {
 
 async function pollMedia() {
   try {
-    const m = await invoke("media_info");
+    // Sampul album hanya dikirim ulang kalau lagunya berganti.
+    const m = await invoke("media_info", { thumbKey: media.thumb_key || "" });
     const prevKey = lyrics.key;
+    if (m && m.available && !m.thumbnail && m.thumb_key && m.thumb_key === media.thumb_key) m.thumbnail = media.thumbnail;
     media = m || { available: false };
     const key = media.available ? `${media.title}|${media.artist}` : "";
     if (key && key !== prevKey) {
@@ -1695,9 +1701,11 @@ renderTodos();
 renderWater();
 renderTimer();
 
+// Saat notch tertutup cukup diperbarui dua kali per detik.
+let renderTick = 0;
 setInterval(() => {
   tickTimer();
-  renderAll();
+  if (expanded || peekCur || renderTick++ % 2 === 0) renderAll();
 }, 250);
 setInterval(prayerReminders, 5000);
 setInterval(refreshPrayer, 15 * 60000);
@@ -1706,8 +1714,8 @@ setInterval(waterReminder, 30000);
 setInterval(todoAlerts, 15000);
 setInterval(pollMedia, 1000);
 setInterval(pollIdle, 1000);
-setInterval(pollStatus, 5000);
-setInterval(pollNotifs, 3000);
+setInterval(pollStatus, 10000);
+setInterval(pollNotifs, 5000);
 pollMedia();
 pollStatus();
 pollNotifs();
