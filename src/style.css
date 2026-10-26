@@ -3188,3 +3188,8 @@ body.no-glass .mascot {
 #notch.dragging .shelf-empty {
   right: 160px;
 }
+
+.conv-list .cf-text {
+  flex: 1;
+  text-align: left;
+}

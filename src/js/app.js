@@ -1429,12 +1429,12 @@ listen("tauri://drag-drop", (e) => {
 
 const CONV_IN = ["png", "jpg", "jpeg", "webp", "bmp", "ico", "tif", "tiff", "gif"];
 const CONV_OUT = ["png", "webp", "pdf", "jpg", "ico", "bmp", "tiff", "gif"];
-// conv.state: "idle" | "pick" (roda format) | "busy" | "done"
+// conv.state: "idle" | "pick" (roda format) | "busy"
 let conv = { state: "idle", files: [], skipped: 0, results: [] };
 
 function startConvert(paths) {
   const files = paths.filter((p) => CONV_IN.includes(extOf(baseName(p))));
-  conv = { state: files.length ? "pick" : "idle", files, skipped: paths.length - files.length, results: conv.results };
+  conv = { state: files.length ? "pick" : "idle", files, skipped: paths.length - files.length, results: [] };
   if (!files.length && paths.length) mascotSay("think", "Hmm, I can only convert images for now 🖼️", 4500);
   renderConvert();
 }
@@ -1469,14 +1469,16 @@ function renderConvert() {
   if (picking) {
     const exts = [...new Set(conv.files.map((p) => extOf(baseName(p)).toUpperCase()))];
     const label = conv.state === "busy" ? "Converting…" : `${conv.files.length} ${exts.length === 1 ? exts[0] : "files"}`;
-    wheel.innerHTML = wheelSvg() + `<button class="conv-center" id="convCancel" title="Cancel"><b>${esc(label)}</b><span>${conv.state === "busy" ? "please wait" : "click to close"}</span></button>`;
+    wheel.innerHTML = wheelSvg() + `<button class="conv-center" id="convCancel" title="Close"><b>${esc(label)}</b><span>${conv.state === "busy" ? "please wait" : "click to close"}</span></button>`;
     wheel.classList.toggle("busy", conv.state === "busy");
   } else {
     wheel.innerHTML = `<div class="conv-hint">${icon("i-convert")}<span>Pick a format after dropping</span></div>`;
   }
-  const list = picking
-    ? conv.files.map((p) => ({ name: baseName(p), sub: "Ready · pick a format" }))
-    : conv.results.map((r) => ({ name: baseName(r.out || r.src), sub: r.error ? r.error : "Converted · drag me out", out: r.out, err: !!r.error }));
+  // Setelah berhasil, roda tetap terbuka untuk file yang sama, jadi bisa
+  // langsung dikonversi lagi ke format lain tanpa menyeret ulang.
+  const list = conv.results.length
+    ? conv.results.map((r) => ({ name: baseName(r.out || r.src), sub: r.error ? r.error : "Converted · drag me out", out: r.out, err: !!r.error }))
+    : conv.files.map((p) => ({ name: baseName(p), sub: "Ready · pick a format" }));
   $("convDrop").hidden = picking || conv.results.length > 0;
   $("convList").innerHTML = list
     .map((f, i) => {
@@ -1487,12 +1489,14 @@ function renderConvert() {
       </li>`;
     })
     .join("") +
-    (picking && conv.skipped ? `<li class="conv-more">${conv.skipped} non-image file${conv.skipped > 1 ? "s" : ""} skipped</li>` : "") +
-    (!picking && conv.results.length ? `<li class="conv-more">Drop more images to convert</li>` : "");
+    (picking && !conv.results.length && conv.skipped ? `<li class="conv-more">${conv.skipped} non-image file${conv.skipped > 1 ? "s" : ""} skipped</li>` : "") +
+    (conv.results.length ? `<li class="conv-more">Pick another format, or drop new images</li>` : "");
 }
 
-$("convWheel").addEventListener("click", async (e) => {
-  if (conv.state !== "pick") return;
+// pointerdown (bukan click): tetap jalan walau Windows "menelan" lepasan
+// tombol mouse setelah file diseret keluar dari notch.
+$("convWheel").addEventListener("pointerdown", async (e) => {
+  if (e.button !== 0 || conv.state !== "pick") return;
   if (e.target.closest("#convCancel")) {
     conv.state = "idle";
     conv.files = [];
@@ -1503,7 +1507,7 @@ $("convWheel").addEventListener("click", async (e) => {
   conv.state = "busy";
   renderConvert();
   const res = (await invoke("convert_files", { paths: conv.files, format: s.dataset.f }).catch((err) => conv.files.map((src) => ({ src, error: String(err) })))) || [];
-  conv = { state: "done", files: [], skipped: 0, results: res };
+  conv = { state: "pick", files: conv.files, skipped: 0, results: res };
   const ok = res.filter((r) => r.out).length;
   if (ok) sounds.pop();
   if (ok) mascotSay("cheer", `Thwip! ${ok} file${ok > 1 ? "s" : ""} converted to ${s.dataset.f.toUpperCase()} 🕸️`, 4000);
@@ -1514,7 +1518,7 @@ $("convWheel").addEventListener("click", async (e) => {
 let convDrag = null;
 $("convList").addEventListener("mousedown", (e) => {
   const el = e.target.closest(".conv-file");
-  if (!el || e.button !== 0 || conv.state !== "done") return;
+  if (!el || e.button !== 0 || !conv.results.length) return;
   convDrag = { i: +el.dataset.i, x: e.clientX, y: e.clientY, started: false };
 });
 window.addEventListener("mousemove", (e) => {
@@ -1534,7 +1538,7 @@ window.addEventListener("mouseup", (e) => {
 });
 $("convList").addEventListener("contextmenu", (e) => {
   const el = e.target.closest(".conv-file");
-  if (!el || conv.state !== "done") return;
+  if (!el || !conv.results.length) return;
   e.preventDefault();
   const r = conv.results[+el.dataset.i];
   if (r?.out) invoke("reveal_file", { path: r.out });
