@@ -1,4 +1,4 @@
-import { invoke, listen, startDrag, focusWindow, autostart, isTauri } from "./bridge.js";
+import { invoke, listen, startDrag, focusWindow, autostart, isTauri, pickFiles } from "./bridge.js";
 import { load, save, clearAll, todayKey } from "./store.js";
 import { sounds } from "./sound.js";
 import { prayerTimes, PRAYERS, CITIES } from "./prayer.js";
@@ -1491,6 +1491,7 @@ function renderConvert() {
     .join("") +
     (picking && !conv.results.length && conv.skipped ? `<li class="conv-more">${conv.skipped} non-image file${conv.skipped > 1 ? "s" : ""} skipped</li>` : "") +
     (conv.results.length ? `<li class="conv-more">Pick another format, or drop new images</li>` : "");
+  $("convTools").hidden = !(conv.files.length || conv.results.length);
 }
 
 // pointerdown (bukan click): tetap jalan walau Windows "menelan" lepasan
@@ -1543,6 +1544,23 @@ $("convList").addEventListener("contextmenu", (e) => {
   const r = conv.results[+el.dataset.i];
   if (r?.out) invoke("reveal_file", { path: r.out });
 });
+// Pilih gambar dari folder mana saja lewat jendela "Open" Windows.
+document.addEventListener("click", async (e) => {
+  if (!e.target.closest(".conv-browse")) return;
+  pinUntil = Date.now() + 120000;
+  const paths = await pickFiles("Choose images to convert", CONV_IN).catch(() => []);
+  pinUntil = Date.now() + 15000;
+  if (paths.length) startConvert(paths);
+  expand(15000);
+});
+
+// Reset: kosongkan file dan hasil, kembali ke kotak "Drop images here".
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#convClear")) return;
+  conv = { state: "idle", files: [], skipped: 0, results: [] };
+  renderConvert();
+});
+
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && conv.state === "pick") {
     conv.state = "idle";

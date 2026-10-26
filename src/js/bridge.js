@@ -87,6 +87,15 @@ export async function startDrag(paths, imageDataUrl) {
   });
 }
 
+/** Jendela "Open" Windows untuk memilih file dari folder mana saja. */
+export async function pickFiles(title, extensions) {
+  if (!T) return ["C:\\Users\\demo\\Documents\\poster.png"];
+  const res = await T.core.invoke("plugin:dialog|open", {
+    options: { title, multiple: true, filters: [{ name: "Images", extensions }] },
+  });
+  return Array.isArray(res) ? res : res ? [res] : [];
+}
+
 export async function focusWindow() {
   if (!T) return;
   try {

@@ -229,6 +229,7 @@ pub fn run() {
         .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, None))
         .plugin(tauri_plugin_drag::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(Interactive::default())
         .manage(system::NotificationState::default())
         .invoke_handler(tauri::generate_handler![

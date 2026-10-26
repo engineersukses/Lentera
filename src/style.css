@@ -3200,3 +3200,35 @@ body.no-glass .mascot {
 *::after {
   text-shadow: none !important;
 }
+
+/* v1.5.3: tombol Browse dan Clear di Converter */
+.conv-drop .conv-browse {
+  margin-top: 8px;
+  height: 32px;
+  font-size: 15px;
+}
+
+.conv-tools {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.conv-tools[hidden] {
+  display: none;
+}
+
+.conv-tools .pill {
+  height: 32px;
+  font-size: 15px;
+}
+
+.conv-list {
+  max-height: 150px;
+}
+
+.conv-list .fname,
+.conv-list .fsize {
+  text-align: left;
+}

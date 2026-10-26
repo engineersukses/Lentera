@@ -9,6 +9,7 @@
     "core:window:allow-set-focus",
     "drag:default",
     "opener:default",
+    "dialog:allow-open",
     "autostart:default"
   ]
 }
