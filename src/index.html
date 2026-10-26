@@ -48,6 +48,7 @@
         <symbol id="i-mosque" viewBox="0 0 24 24"><path d="M12 3c-.5 1.5-4.5 3.5-4.5 7h9C16.5 6.5 12.5 4.5 12 3zM6 21v-9h12v9h-4v-4a2 2 0 0 0-4 0v4zM3.5 21V9.5M20.5 21V9.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" /></symbol>
         <symbol id="i-note" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM14.5 3v4.5H19M9 12h7M9 16h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" /></symbol>
         <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 17.5V6l11-2.5v11.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /><circle cx="6.5" cy="17.5" r="2.7" fill="currentColor" /><circle cx="17.5" cy="15" r="2.7" fill="currentColor" /></symbol>
+        <symbol id="i-convert" viewBox="0 0 24 24"><path d="M5 9a7 7 0 0 1 12.5-3.5M19 5v4h-4M19 15a7 7 0 0 1-12.5 3.5M5 19v-4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
         <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h5l2 2h8A1.5 1.5 0 0 1 21 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z" fill="currentColor" /></symbol>
         <symbol id="i-battery-low" viewBox="0 0 24 24"><rect x="2.5" y="7" width="17" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8" /><rect x="5" y="9.5" width="3.5" height="5" rx="1" fill="currentColor" /><path d="M21.5 10.5v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></symbol>
         <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></symbol>
@@ -206,6 +207,22 @@
                 </div>
                 <ul class="shelf-items" id="shelfItems"></ul>
                 <button class="shelf-clear" id="shelfClear" title="Clear shelf">Clear</button>
+                <div class="shelf-conv" id="shelfConv"><svg><use href="#i-convert" /></svg><b>Convert</b></div>
+              </div>
+            </section>
+
+            <!-- Pengubah format file -->
+            <section class="page" data-page="convert">
+              <div class="conv" id="conv">
+                <div class="conv-side">
+                  <div class="conv-drop" id="convDrop">
+                    <svg><use href="#i-convert" /></svg>
+                    <b id="convDropText">Drop images here</b>
+                    <span>PNG · JPG · WEBP · PDF · ICO · BMP · TIFF · GIF</span>
+                  </div>
+                  <ul class="conv-list" id="convList"></ul>
+                </div>
+                <div class="conv-wheel" id="convWheel"></div>
               </div>
             </section>
 

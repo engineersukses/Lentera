@@ -29,6 +29,7 @@ Settings dibuka lewat ikon gerigi di kiri atas panel.
 | 🔋🎧📶 Kartu sekilas | Muncul sebentar saat charger dicolok, earbuds tersambung, Wi-Fi putus, baterai lemah. |
 | 🔊⇪⌨ Tampilan kecil | Volume, Caps Lock, dan ganti bahasa keyboard (dibaca berkala, tanpa merekam ketikan). |
 | 🔔 Notifikasi ✨ | Notifikasi aplikasi lain tampil sekilas di notch dan tersimpan di tab Notif. |
+| 🔄 File Converter ✨ | Seret gambar ke halaman Converter (atau ke kotak **Convert** di Shelf), lalu pilih format dari roda: PNG, JPG, WEBP, PDF, ICO, BMP, TIFF, GIF. Hasilnya disimpan di folder yang sama dengan file aslinya dan bisa langsung diseret keluar. |
 | 🕷️ Spidey ✨ | Spider-Man kecil bergaya pixel art yang turun bergelantungan di benang jaring di samping notch tiap beberapa menit: menyapa, minum, joget saat ada lagu, mengantuk saat malam, mengingatkan sholat, kaget saat baterai lemah. Bisa diklik. |
 
 Urutan halaman: Musik, Timer, Sholat, Air, Rak, Tugas, Notifikasi, Pengaturan.

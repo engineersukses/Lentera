@@ -742,6 +742,7 @@ svg {
 #notch[data-page="prayer"] .page[data-page="prayer"],
 #notch[data-page="water"] .page[data-page="water"],
 #notch[data-page="shelf"] .page[data-page="shelf"],
+#notch[data-page="convert"] .page[data-page="convert"],
 #notch[data-page="todo"] .page[data-page="todo"],
 #notch[data-page="notif"] .page[data-page="notif"],
 #notch[data-page="settings"] .page[data-page="settings"] {
@@ -2897,4 +2898,293 @@ body.no-glass .mascot {
    setiap kali isi notch bergerak */
 #notch .body::after {
   will-change: transform;
+}
+
+/* =====================================================================
+   v1.5: File Converter. Seret gambar, pilih format dari roda.
+   ===================================================================== */
+
+#notch.expanded[data-page="convert"]:not(.lyrics-mode) {
+  --h: 300px;
+}
+
+/* Kotak "Convert" di Shelf, hanya muncul saat file sedang diseret */
+.shelf-conv {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  bottom: 10px;
+  width: 150px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 2px dashed rgba(255, 255, 255, 0.55);
+  border-radius: 14px;
+  background: rgba(13, 11, 20, 0.55);
+  font-size: 19px;
+  z-index: 3;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.shelf-conv svg {
+  width: 34px;
+  height: 34px;
+}
+
+#notch.dragging .shelf-conv {
+  display: flex;
+}
+
+.shelf-conv.hot {
+  background: #e0262f;
+  border: 2px solid var(--ink);
+  box-shadow: 0 3px 0 var(--ink);
+  transform: scale(1.04);
+}
+
+.conv {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 8px 0 12px;
+}
+
+.conv-side {
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.conv-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 190px;
+  border: 2px dashed rgba(255, 255, 255, 0.35);
+  border-radius: 16px;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.conv-drop[hidden] {
+  display: none;
+}
+
+#notch.dragging .conv-drop {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.conv-drop svg {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 4px;
+}
+
+.conv-drop b {
+  font-size: 23px;
+}
+
+.conv-drop span {
+  color: var(--fg-2);
+  font-size: 14px;
+  padding: 0 10px;
+}
+
+.conv-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.conv-list .conv-file {
+  flex: none;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--ink);
+  box-shadow: 0 3px 0 var(--ink);
+}
+
+.conv-list .ficon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 46px;
+  font-size: 11px;
+}
+
+.cf-text {
+  min-width: 0;
+}
+
+.conv-list .fname,
+.conv-list .fsize {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conv-list .fname {
+  font-size: 17px;
+}
+
+.conv-list .missing .fsize {
+  color: #ff8a8a;
+}
+
+.conv-more {
+  color: var(--fg-2);
+  font-size: 14px;
+  text-align: center;
+  padding-top: 2px;
+}
+
+/* Roda format */
+.conv-wheel {
+  position: relative;
+  flex: 0 0 236px;
+  height: 236px;
+  display: grid;
+  place-items: center;
+}
+
+.conv-wheel > svg {
+  width: 236px;
+  height: 236px;
+  overflow: visible;
+  filter: drop-shadow(0 4px 0 var(--ink));
+}
+
+.conv-wheel .slice path {
+  fill: #f6efe3;
+  stroke: var(--ink);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  transition: fill 0.12s;
+}
+
+.conv-wheel .slice text {
+  fill: #1c1a26;
+  font-family: "Pixelify Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.conv-wheel .slice {
+  cursor: pointer;
+  transform-origin: 0 0;
+  transition: transform 0.12s;
+}
+
+.conv-wheel .slice:hover {
+  transform: scale(1.06);
+}
+
+.conv-wheel .slice:hover path {
+  fill: #e0262f;
+}
+
+.conv-wheel .slice:hover text {
+  fill: #fff;
+}
+
+.conv-wheel .slice.off {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.conv-wheel .slice.off:hover {
+  transform: none;
+}
+
+.conv-wheel .slice.off:hover path {
+  fill: #f6efe3;
+}
+
+.conv-wheel .slice.off:hover text {
+  fill: #1c1a26;
+}
+
+.conv-wheel.busy .slice {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.conv-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
+  border-radius: 50%;
+  border: 2.5px solid var(--ink);
+  background: #fff;
+  color: #1c1a26;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+  cursor: pointer;
+}
+
+.conv-center b {
+  font-size: 15px;
+}
+
+.conv-center span {
+  font-size: 10px;
+  color: #6b6878;
+}
+
+.conv-wheel.busy .conv-center b {
+  font-size: 12px;
+}
+
+.conv-hint {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 255, 255, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--fg-2);
+  font-size: 14px;
+  text-align: center;
+  padding: 30px;
+}
+
+.conv-hint svg {
+  width: 40px;
+  height: 40px;
+  opacity: 0.6;
+}
+
+#notch.dragging .shelf-empty {
+  right: 160px;
 }

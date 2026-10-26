@@ -41,6 +41,8 @@ const mock = {
     plain: null,
     instrumental: false,
   }),
+  convert_files: ({ paths, format }) =>
+    new Promise((ok) => setTimeout(() => ok(paths.map((src) => ({ src, out: src.replace(/\.[^.]+$/, "." + format) }))), 700)),
   file_info: ({ path }) => ({ exists: true, is_dir: !path.includes("."), size: 2516582 }),
   media_seek: ({ positionMs }) => {
     demoStart = Date.now() - positionMs;

@@ -56,7 +56,7 @@ document.documentElement.style.zoom = ZOOM;
 
 /* ================= Halaman (panah kiri/kanan + titik) ================= */
 
-const PAGES = ["music", "timer", "prayer", "water", "shelf", "todo", "notif"];
+const PAGES = ["music", "timer", "prayer", "water", "shelf", "convert", "todo", "notif"];
 let page = PAGES.includes(load("page", "music")) ? load("page", "music") : "music";
 let settingsOpen = false;
 let gearTurns = 0;
@@ -85,6 +85,7 @@ function setPage(p) {
   save("page", p);
   setHtml($("dots"), PAGES.map((x) => `<button data-p="${x}" class="${x === p ? "on" : ""}"></button>`).join(""));
   if (p === "shelf") renderShelf();
+  if (p === "convert") renderConvert();
   if (p === "music") lyricsBuiltFor = "";
   if (p !== "timer") $("fEdit").hidden = true;
   if (p !== "water" && !$("waterSet").hidden) waterAdjust(false);
@@ -130,7 +131,10 @@ let collapseTimer = null;
 
 const lyricsMode = () => expanded && !settingsOpen && page === "music" && settings.lyricsOpen;
 // Halaman sholat sedikit lebih lebar supaya enam kartu waktunya muat.
-const expandedSize = () => ({ w: lyricsMode() ? 820 : notch.dataset.page === "prayer" ? 730 : 660, h: 228 });
+const expandedSize = () => ({
+  w: lyricsMode() ? 820 : notch.dataset.page === "prayer" ? 730 : 660,
+  h: notch.dataset.page === "convert" ? 300 : 228,
+});
 
 function applyLyricsMode() {
   notch.classList.toggle("lyrics-mode", lyricsMode());
@@ -206,6 +210,11 @@ window.lentera = {
     expand(8000);
   },
   peek: (p) => peek(p),
+  convert(paths) {
+    setPage("convert");
+    startConvert(paths);
+    expand(15000);
+  },
   collapse() {
     pinUntil = 0;
     hoverDom = hoverNative = false;
@@ -1361,27 +1370,181 @@ $("shelfClear").addEventListener("click", () => {
   renderShelf();
 });
 
-// File diseret dari Explorer ke notch.
+// File diseret dari Explorer ke notch. Di halaman Converter langsung masuk
+// ke pengubah format; di tempat lain masuk ke Shelf, kecuali dilepas di
+// kotak "Convert" di sisi kanan Shelf.
+let dropToConvert = false;
+function overConvertZone(pos) {
+  if (!pos) return false;
+  const r = $("shelfConv").getBoundingClientRect();
+  const x = pos.x / devicePixelRatio;
+  const y = pos.y / devicePixelRatio;
+  return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+}
 listen("tauri://drag-enter", () => {
-  setPage("shelf");
+  if (page !== "convert" || settingsOpen) setPage("shelf");
   expand(4000);
   notch.classList.add("dragging");
+  if (page === "convert") {
+    $("convDropText").textContent = "Release to convert";
+    return;
+  }
   $("shelfDropText").textContent = "Release to add";
   $("shelfEmpty").style.display = "";
+});
+listen("tauri://drag-over", (e) => {
+  if (page !== "shelf") return;
+  dropToConvert = overConvertZone(e.payload?.position);
+  $("shelfConv").classList.toggle("hot", dropToConvert);
 });
 listen("tauri://drag-leave", () => {
   notch.classList.remove("dragging");
   $("shelfDropText").textContent = "Drop files here";
+  $("convDropText").textContent = "Drop images here";
+  $("shelfConv").classList.remove("hot");
+  dropToConvert = false;
   renderShelf();
   scheduleCollapse();
 });
 listen("tauri://drag-drop", (e) => {
   notch.classList.remove("dragging");
   $("shelfDropText").textContent = "Drop files here";
-  addToShelf(e.payload?.paths);
-  renderShelf();
-  expand(2500);
+  $("convDropText").textContent = "Drop images here";
+  $("shelfConv").classList.remove("hot");
+  const paths = e.payload?.paths || [];
+  if (page === "convert" || dropToConvert || overConvertZone(e.payload?.position)) {
+    dropToConvert = false;
+    setPage("convert");
+    startConvert(paths);
+    expand(15000);
+  } else {
+    addToShelf(paths);
+    renderShelf();
+    expand(2500);
+  }
   scheduleCollapse();
+});
+
+/* ================= Pengubah format (File Converter) ================= */
+
+const CONV_IN = ["png", "jpg", "jpeg", "webp", "bmp", "ico", "tif", "tiff", "gif"];
+const CONV_OUT = ["png", "webp", "pdf", "jpg", "ico", "bmp", "tiff", "gif"];
+// conv.state: "idle" | "pick" (roda format) | "busy" | "done"
+let conv = { state: "idle", files: [], skipped: 0, results: [] };
+
+function startConvert(paths) {
+  const files = paths.filter((p) => CONV_IN.includes(extOf(baseName(p))));
+  conv = { state: files.length ? "pick" : "idle", files, skipped: paths.length - files.length, results: conv.results };
+  if (!files.length && paths.length) mascotSay("think", "Hmm, I can only convert images for now 🖼️", 4500);
+  renderConvert();
+}
+
+const sameFormat = (fmt) => conv.files.length && conv.files.every((p) => {
+  const e = extOf(baseName(p));
+  return e === fmt || (fmt === "jpg" && e === "jpeg") || (fmt === "tiff" && e === "tif");
+});
+
+function wheelSvg() {
+  const n = CONV_OUT.length;
+  const R = 112, r = 46, step = (Math.PI * 2) / n;
+  const pt = (rad, a) => `${(rad * Math.cos(a)).toFixed(2)} ${(rad * Math.sin(a)).toFixed(2)}`;
+  const slices = CONV_OUT.map((fmt, i) => {
+    const a0 = -Math.PI / 2 - step / 2 + i * step + 0.012;
+    const a1 = a0 + step - 0.024;
+    const mid = (a0 + a1) / 2;
+    const [lx, ly] = pt(79, mid).split(" ");
+    const off = sameFormat(fmt);
+    return `<g class="slice ${off ? "off" : ""}" data-f="${fmt}">
+      <path d="M${pt(r, a0)} L${pt(R, a0)} A${R} ${R} 0 0 1 ${pt(R, a1)} L${pt(r, a1)} A${r} ${r} 0 0 0 ${pt(r, a0)}Z"/>
+      <text x="${lx}" y="${ly}">${fmt.toUpperCase()}</text>
+    </g>`;
+  }).join("");
+  return `<svg viewBox="-118 -118 236 236">${slices}</svg>`;
+}
+
+function renderConvert() {
+  const wheel = $("convWheel");
+  const picking = conv.state === "pick" || conv.state === "busy";
+  $("conv").classList.toggle("picking", picking);
+  if (picking) {
+    const exts = [...new Set(conv.files.map((p) => extOf(baseName(p)).toUpperCase()))];
+    const label = conv.state === "busy" ? "Converting…" : `${conv.files.length} ${exts.length === 1 ? exts[0] : "files"}`;
+    wheel.innerHTML = wheelSvg() + `<button class="conv-center" id="convCancel" title="Cancel"><b>${esc(label)}</b><span>${conv.state === "busy" ? "please wait" : "click to close"}</span></button>`;
+    wheel.classList.toggle("busy", conv.state === "busy");
+  } else {
+    wheel.innerHTML = `<div class="conv-hint">${icon("i-convert")}<span>Pick a format after dropping</span></div>`;
+  }
+  const list = picking
+    ? conv.files.map((p) => ({ name: baseName(p), sub: "Ready · pick a format" }))
+    : conv.results.map((r) => ({ name: baseName(r.out || r.src), sub: r.error ? r.error : "Converted · drag me out", out: r.out, err: !!r.error }));
+  $("convDrop").hidden = picking || conv.results.length > 0;
+  $("convList").innerHTML = list
+    .map((f, i) => {
+      const ext = extOf(f.name);
+      return `<li class="file conv-file ${f.err ? "missing" : ""}" data-i="${i}" title="${esc(f.out || f.name)}">
+        <div class="ficon" style="background:${EXT_COLORS[ext] || "#d1d1d6"}">${esc(ext.toUpperCase() || "FILE")}</div>
+        <div class="cf-text"><div class="fname">${esc(f.name)}</div><div class="fsize">${esc(f.sub)}</div></div>
+      </li>`;
+    })
+    .join("") +
+    (picking && conv.skipped ? `<li class="conv-more">${conv.skipped} non-image file${conv.skipped > 1 ? "s" : ""} skipped</li>` : "") +
+    (!picking && conv.results.length ? `<li class="conv-more">Drop more images to convert</li>` : "");
+}
+
+$("convWheel").addEventListener("click", async (e) => {
+  if (conv.state !== "pick") return;
+  if (e.target.closest("#convCancel")) {
+    conv.state = "idle";
+    conv.files = [];
+    return renderConvert();
+  }
+  const s = e.target.closest(".slice");
+  if (!s || s.classList.contains("off")) return;
+  conv.state = "busy";
+  renderConvert();
+  const res = (await invoke("convert_files", { paths: conv.files, format: s.dataset.f }).catch((err) => conv.files.map((src) => ({ src, error: String(err) })))) || [];
+  conv = { state: "done", files: [], skipped: 0, results: res };
+  const ok = res.filter((r) => r.out).length;
+  if (ok) sounds.pop();
+  if (ok) mascotSay("cheer", `Thwip! ${ok} file${ok > 1 ? "s" : ""} converted to ${s.dataset.f.toUpperCase()} 🕸️`, 4000);
+  renderConvert();
+});
+
+// Hasil konversi bisa diseret keluar, diklik untuk dibuka, klik kanan untuk membuka foldernya.
+let convDrag = null;
+$("convList").addEventListener("mousedown", (e) => {
+  const el = e.target.closest(".conv-file");
+  if (!el || e.button !== 0 || conv.state !== "done") return;
+  convDrag = { i: +el.dataset.i, x: e.clientX, y: e.clientY, started: false };
+});
+window.addEventListener("mousemove", (e) => {
+  if (!convDrag || convDrag.started) return;
+  if (Math.hypot(e.clientX - convDrag.x, e.clientY - convDrag.y) > 5) {
+    convDrag.started = true;
+    const r = conv.results[convDrag.i];
+    if (r?.out) startDrag([r.out], dragIcon(baseName(r.out))).catch(() => {});
+  }
+});
+window.addEventListener("mouseup", (e) => {
+  if (convDrag && !convDrag.started && e.target.closest(".conv-file")) {
+    const r = conv.results[convDrag.i];
+    if (r?.out) invoke("open_file", { path: r.out });
+  }
+  convDrag = null;
+});
+$("convList").addEventListener("contextmenu", (e) => {
+  const el = e.target.closest(".conv-file");
+  if (!el || conv.state !== "done") return;
+  e.preventDefault();
+  const r = conv.results[+el.dataset.i];
+  if (r?.out) invoke("reveal_file", { path: r.out });
+});
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && conv.state === "pick") {
+    conv.state = "idle";
+    conv.files = [];
+    renderConvert();
+  }
 });
 
 /* ================= Status perangkat ================= */
@@ -1542,6 +1705,7 @@ function titleFor(p) {
   }
   if (p === "water") return $("waterSet").hidden ? `Drink <em style="color:#2f8cff">Water</em>` : `Water <em style="color:#2f8cff">Settings</em>`;
   if (p === "shelf") return "Shelf";
+  if (p === "convert") return `File <em style="color:#ff4b55">Converter</em>`;
   if (p === "todo") return `To-do <em style="color:#32d74b">List</em>`;
   if (p === "notif") return "Notifications";
   return "Settings";

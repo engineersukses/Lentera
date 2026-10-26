@@ -1,3 +1,4 @@
+mod convert;
 mod lyrics;
 mod system;
 
@@ -91,6 +92,12 @@ async fn http_json(url: String) -> Result<serde_json::Value, String> {
     })
     .await
     .map_err(|e| e.to_string())?
+}
+
+/// Ubah format gambar; hasilnya disimpan di samping file aslinya.
+#[tauri::command]
+async fn convert_files(paths: Vec<String>, format: String) -> Vec<convert::Converted> {
+    blocking(move || convert::convert_all(&paths, &format)).await
 }
 
 #[tauri::command]
@@ -237,6 +244,7 @@ pub fn run() {
             idle_ms,
             open_file,
             reveal_file,
+            convert_files,
         ])
         .setup(|app| {
             let win = app.get_webview_window("main").expect("jendela utama");
