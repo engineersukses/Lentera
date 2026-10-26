@@ -3193,3 +3193,10 @@ body.no-glass .mascot {
   flex: 1;
   text-align: left;
 }
+
+/* v1.5.2: tanpa bayangan tulisan, supaya huruf lebih jelas */
+*,
+*::before,
+*::after {
+  text-shadow: none !important;
+}
